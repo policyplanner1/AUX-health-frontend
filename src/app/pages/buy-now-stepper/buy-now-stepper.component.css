@@ -1,0 +1,778 @@
+/* =========================================================
+   GLOBAL RESET
+========================================================= */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background: #fff;
+  color: #14202a;
+  line-height: 1.4;
+}
+
+/* =========================================================
+   WRAPPER
+========================================================= */
+.buy-now-stepper {
+  max-width: 1200px;
+  margin: 20px auto;
+  padding: 0 18px;
+}
+
+/* =========================================================
+   HEADER + STEPPER
+========================================================= */
+.stepper-container {
+  width: 100%;
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 18px 20px;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Back + Title */
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.back-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+}
+.stepper-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #0f2430;
+  white-space: nowrap;
+}
+
+/* WIDE spacing between circles */
+.step-indicators {
+  gap: 130px !important;
+}
+/* Adjust line length so it touches the circles */
+.step:nth-child(1)::after,
+.step:nth-child(2)::after {
+    width: 152px !important;
+    left: 21px !important;
+    top: 20px !important;
+}
+
+/* Completed lines color */
+.step.completed:nth-child(1)::after,
+.step.completed:nth-child(2)::after,
+.step.active:nth-child(2)::after {
+  background: #72e4ef !important;
+}
+.popup-box button {
+  margin: 0 auto !important;
+  display: block !important;
+}
+
+/* ========== STEPPER INDICATORS (EXACT LIKE SCREENSHOT) ========== */
+.header-center {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.step-indicators {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 45px;
+  position: relative;
+}
+
+/* Step container */
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+/* Step circle */
+.step-number {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #f6f7f8;
+  border: 2px solid #d3d9de;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #7d8a94;
+  font-weight: 700;
+  font-size: 14px;
+  z-index: 2;
+}
+
+/* Active (blue) */
+.step.active .step-number {
+  background: #0b6a7e;
+  border-color: #0b6a7e;
+  color: #fff;
+}
+
+/* Completed (green tick) */
+.step.completed .step-number {
+  background: #eafff0;
+  border-color: #6ad58b;
+  color: transparent !important;
+}
+.step.completed .step-number::before {
+  content: "✔";
+  font-size: 14px;
+  font-weight: 700;
+  color: #34b66f;
+}
+
+/* Step Labels */
+.step-label {
+  margin-top: 6px;
+  font-size: 13px;
+  color: #7d8a94;
+}
+.step.active .step-label {
+  color: #0b6a7e;
+  font-weight: 600;
+}
+
+/* Lines between circles */
+.step:nth-child(1)::after,
+.step:nth-child(2)::after {
+  content: "";
+  position: absolute;
+  top: 17px;
+  left: 46px;
+  width: 75px;
+  height: 2px;
+  background: #d3d9de;
+  z-index: 1;
+}
+
+/* Completed 1→2 line */
+.step.completed:nth-child(1)::after {
+  background: #9de7f0;
+}
+/* Completed 2→3 line */
+.step.completed:nth-child(2)::after {
+  background: #9de7f0;
+}
+
+/* If step 3 active → highlight previous lines */
+.step.active:nth-child(3) ~ .step:nth-child(2)::after,
+.step.active:nth-child(3) ~ .step:nth-child(1)::after {
+  background: #9de7f0;
+}
+
+/* =========================================================
+   FORM SECTION CARD
+========================================================= */
+.step-content {
+  background: #ffffff;
+  padding: 22px;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.05);
+  margin-bottom: 20px;
+}
+
+.product-dropdown-card {
+  background: #f2fbff;
+  border: 1px solid #dbeff7;
+  border-radius: 10px;
+  padding: 18px 20px;
+  margin-bottom: 18px;
+}
+
+.section-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 14px;
+}
+
+/* =========================================================
+   GRID (4 → 2 → 1)
+========================================================= */
+.row-4col {
+  display: grid;
+  grid-template-columns: repeat(4,1fr);
+  gap: 18px;
+  margin-bottom: 14px;
+}
+
+.dropdown-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.dropdown-group label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #24343c;
+}
+
+/* Inputs */
+.custom-input,
+.custom-dropdown {
+  height: 40px;
+  border: 1px solid #d3dbdf;
+  border-radius: 8px;
+  padding: 0 12px;
+  font-size: 14px;
+}
+.custom-input:focus,
+.custom-dropdown:focus {
+  outline: none;
+  border-color: #0b6a7e;
+  box-shadow: 0 0 0 3px rgba(11,106,126,0.15);
+}
+
+/* Radio rows */
+.radio-row {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* Error */
+.field-error {
+  font-size: 12px;
+  color: #d93025;
+  margin-top: -2px;
+}
+
+/* =========================================================
+   COUNTERS
+========================================================= */
+.counter-card {
+  height: 40px;
+  background: #e9f7ff;
+  border: 1px solid #ccecff;
+  border-radius: 8px;
+  padding: 6px 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.counter-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.counter-title {
+  font-weight: 600;
+  font-size: 14px;
+}
+.counter-controls {
+  display: flex;
+  align-items: center;
+  background: #fff;
+  border-radius: 50px;
+  border: 1px solid #d3dbdf;
+  padding: 4px 8px;
+  gap: 8px;
+}
+.counter-btn {
+  width: 26px;
+  height: 26px;
+  border-radius: 4px;
+  background: #fff;
+  border: 1px solid #0b6a7e;
+  color: #0b6a7e;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.counter-value {
+  font-weight: 700;
+  color: #0b6a7e;
+}
+
+/* ============================================
+   FIX — CLEAN DISEASE DROPDOWN (LIST STYLE)
+============================================ */
+/* ============================================
+   CLEAN DISEASE DROPDOWN (FIXED)
+============================================ */
+
+.dropdown-group {
+  position: relative;
+}
+
+/* Box you click */
+.multi-select-box {
+  height: 40px;
+  border: 1px solid #d3dbdf;
+  border-radius: 8px;
+  padding: 0 12px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  background: #fff;
+  cursor: pointer;
+
+  font-size: 14px;
+  position: relative;
+}
+
+/* Floating dropdown list */
+.multi-select-dropdown {
+  margin-top: 6px !important;  /* FIX: Push dropdown slightly downward */
+  position: absolute;
+  top: 60px;
+  left: 0;
+  width: 100%;
+
+  background: #fff;
+  border: 1px solid #cfe5f2;
+  border-radius: 8px;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.12);
+
+  padding: 12px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 1000;
+
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Vertical list item */
+.multi-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  font-size: 14px;
+  font-weight: 500;
+  color: #29333a;
+
+  cursor: pointer;
+}
+
+/* Clean checkboxes */
+.multi-option input {
+  width: 16px;
+  height: 16px;
+}
+
+/* Arrow rotation */
+.rotate {
+  transform: rotate(180deg);
+  transition: 0.25s ease;
+}
+
+
+/* ===========================================================
+   SUMMARY PAGE – PROFESSIONAL UI FIX
+=========================================================== */
+
+/* Main Heading */
+.proposal-summary-heading {
+  font-size: 26px;
+  font-weight: 800;
+  color: #0b6a7e;
+  margin-bottom: 24px;
+  text-align: left;
+  letter-spacing: 0.5px;
+}
+
+/* Cards layout */
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+}
+
+/* Individual card */
+.summary-card {
+  background: #ffffff;
+  border: 1px solid #d3e7f1;
+  border-radius: 14px;
+  padding: 20px 22px;
+  box-shadow: 0px 4px 12px rgba(0,0,0,0.05);
+}
+
+/* Titles */
+.summary-card-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #0b6a7e;
+  margin-bottom: 16px;
+}
+
+/* Line items */
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  border-bottom: 1px dashed #e5eef3;
+}
+
+.summary-item:last-child {
+  border-bottom: none;
+}
+
+/* Labels */
+.summary-item label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #6b7b89;
+  width: 50%;
+}
+
+/* Values */
+.summary-item span {
+  font-size: 14px;
+  font-weight: 700;
+  color: #14202a;
+  text-align: right;
+  width: 50%;
+}
+
+/* Adult & Child section container */
+.member-section {
+  margin-top: 30px;
+  background: #ffffff;
+  padding: 22px 24px;
+  border-radius: 14px;
+  border: 1px solid #d3e7f1;
+  box-shadow: 0px 4px 12px rgba(0,0,0,0.05);
+}
+
+/* Section heading */
+.summary-heading {
+  font-size: 20px;
+  font-weight: 800;
+  color: #0b6a7e;
+  margin-bottom: 18px;
+}
+
+/* Each member card */
+.member-card {
+  background: #f7fcff;
+  border: 1px solid #d7edf7;
+  border-radius: 12px;
+  padding: 18px;
+  margin-bottom: 18px;
+}
+
+/* Member grid */
+.member-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+}
+
+/* Label → Value pair */
+.field label {
+  font-size: 13px;
+  color: #6b7b89;
+  font-weight: 600;
+}
+
+.field span {
+  font-size: 14px;
+  font-weight: 700;
+  color: #0f2430;
+}
+
+/* ============================
+   MEMBER SECTION (ADULT/CHILD)
+============================ */
+.member-section {
+  background: #f2fbff;
+  border: 1px solid #dbeff7;
+  padding: 18px 20px;
+  border-radius: 12px;
+  margin-bottom: 22px;
+}
+
+.member-card {
+  background: #fff;
+  border: 1px solid #dbeff7;
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 18px;
+}
+
+.member-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.field label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #0b6a7e;
+}
+.field span {
+  font-size: 14px;
+  font-weight: 700;
+  color: #14202a;
+}
+
+/* ============================
+   RESPONSIVE FIX
+============================ */
+@media(max-width: 992px) {
+  .summary-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .member-row {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media(max-width: 600px) {
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
+  .member-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Adult/Child summary */
+.adult-summary-card,
+.child-summary-card {
+  background: #f2fbff;
+  border: 1px solid #dbeff7;
+  padding: 14px 18px;
+  border-radius: 10px;
+  margin-bottom: 18px;
+}
+
+.adult-summary-row,
+.child-summary-row {
+  display: grid;
+  grid-template-columns: repeat(8,auto);
+  gap: 12px;
+  margin-bottom: 8px;
+}
+.adult-summary-row label,
+.child-summary-row label {
+  font-weight: 600;
+  font-size: 13px;
+  color: #667;
+}
+
+/* =========================================================
+   BUTTONS
+========================================================= */
+.navigation-buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+.btn {
+  min-width: 160px;
+  height: 44px;
+  border-radius: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: 700;
+  cursor: pointer;
+}
+.btn-primary {
+  background: #0b6a7e;
+  color: #fff;
+}
+.btn-secondary {
+  background: #e0e0e0;
+  color: #333;
+}
+
+/* =========================================================
+   POPUP
+========================================================= */
+.popup-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+.popup-box {
+  width: 420px;
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+
+}
+
+/* Light background & border (same as form 2) */
+.product-dropdown-card,
+.summary-card,
+.adult-summary-card,
+.child-summary-card {
+  background: #f2fbff !important;
+  border: 1px solid #dbeff7 !important;
+}
+
+/* Titles color unify */
+.section-title,
+.summary-heading {
+  color: #0b6a7e !important;
+  font-weight: 700;
+}
+
+/* =========================================================
+   VERTICAL LAYOUT — Adult Details (SAFE PATCH)
+========================================================= */
+
+/* New inner background */
+.adult-summary-card {
+  background: #eaf7ff !important;      /* Soft blue */
+  border: 1px solid #d5e9f6 !important; /* Slightly darker border */
+  border-radius: 12px;
+  padding: 18px 20px !important;
+  margin-bottom: 18px;
+}
+
+/* Vertical list layout */
+.adult-summary-row {
+  display: grid !important;
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 25px !important;
+  padding: 10px 0 !important;
+}
+.adult-summary-row > div {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 4px !important;
+}
+.adult-summary-row label {
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  color: #0b6a7e !important;
+}
+
+/* Value styling */
+.adult-summary-row span {
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  color: #14202a !important;
+}
+
+/* Each field block (one label + one value) */
+.adult-summary-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* Label styling */
+.adult-summary-item label {
+  font-size: 13px;
+ font-weight: 700 !important;
+  color: #0b6a7e !important;
+}
+.child-summary-item label {
+  font-weight: 700 !important;
+  color: #0b6a7e !important;
+}
+/* Value styling */
+.adult-summary-item span {
+  font-size: 14px;
+  font-weight: 600 !important;
+  color: #14202a !important;
+}
+.child-summary-item span {
+  font-weight: 600 !important;
+  color: #14202a !important;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+@media(max-width:768px){
+  .summary-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .summary-item label {
+    width: 140px !important;
+  }
+  .summary-card {
+    padding: 16px !important;
+  }
+  .summary-card-title {
+    font-size: 16px !important;
+  }
+}
+
+@media(max-width:480px){
+  .proposal-summary-heading {
+    font-size: 20px !important;
+  }
+  .summary-card-title {
+    font-size: 15px;
+  }
+}
+
+/* Tablet */
+@media(max-width:992px){
+  .row-4col { grid-template-columns: repeat(2,1fr); }
+  .summary-grid { grid-template-columns: repeat(2,1fr); }
+  .adult-summary-row,
+  .child-summary-row {
+    grid-template-columns: repeat(2,1fr);
+  }
+}
+
+/* Mobile */
+@media(max-width:600px){
+  .row-4col { grid-template-columns: 1fr; }
+  .header-left { white-space: nowrap; }
+  .stepper-title { font-size: 18px; }
+
+  /* stepper resize */
+  .step-indicators { gap: 22px; }
+  .step-number { width: 28px; height: 28px; font-size: 12px; }
+  .step-label { font-size: 10px; }
+
+  .step:nth-child(1)::after,
+  .step:nth-child(2)::after {
+    width: 50px;
+    left: 38px;
+  }
+
+  .summary-grid { grid-template-columns: 1fr; }
+  .adult-summary-row,
+  .child-summary-row {
+    grid-template-columns: 1fr;
+  }
+
+  .navigation-buttons { flex-direction: column; }
+  .btn { width: 100%; }
+}

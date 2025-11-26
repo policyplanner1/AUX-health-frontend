@@ -1,0 +1,33 @@
+<div class="info-slider" [style.--maxW]="maxWidth">
+  <div class="card-wrap">
+    <!-- <button class="nav nav-left" (click)="prev()" aria-label="Previous">&#10094;</button> -->
+
+    <!-- Use the safe alias 'slide' so fields aren't possibly undefined -->
+    <div class="card" *ngIf="current as slide">
+<div class="p-3">
+        <div class="img-wrap">
+        <img [src]="slide.img" alt="" />
+      </div>
+
+      <h5 class="title text-center" *ngIf="slide.title">{{ slide.title }}</h5>
+      <p class="desc text-center" *ngIf="slide.desc">{{ slide.desc }}</p>
+</div>
+
+      <div class="accent"
+           [style.background]="slide.accentColor || 'linear-gradient(90deg,#0fb2ff 0%, #ff8a00 100%)'">
+      </div>
+    </div>
+
+    <!-- <button class="nav nav-right" (click)="next()" aria-label="Next">&#10095;</button> -->
+  </div>
+
+  <!-- ✅ No more TS2532 -->
+  <div class="dots" *ngIf="hasMultiple">
+    <button
+      *ngFor="let s of slides; index as i; trackBy: trackByIdx"
+      class="dot"
+      [class.active]="i === idx"
+      (click)="goTo(i)">
+    </button>
+  </div>
+</div>

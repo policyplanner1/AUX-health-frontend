@@ -1,0 +1,172 @@
+<!-- Breadcrumbs -->
+<nav class="crumbs container" aria-label="breadcrumb">
+  <ol class="breadcrumb mb-3">
+    <li class="breadcrumb-item"><a href="javascript:void(0)">Health Insurance</a></li>
+    <li class="breadcrumb-item"><a href="javascript:void(0)">Personal Details</a></li>
+    <li class="breadcrumb-item"><a href="javascript:void(0)">List of Quotes</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Personal Details</li>
+  </ol>
+</nav>
+
+<hr>
+
+<div class="container my-4 plan-page">
+  <div class="row g-3">
+    <!-- LEFT (scrollable) -->
+    <div class="col-lg-8 d-flex flex-column gap-3 left-pane">
+      <!-- Product header -->
+      <section class="card card-soft p-3">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+          <div class="d-flex align-items-center gap-3">
+            <img [src]="insurerLogo" alt="Insurer logo" class="brand-logo" />
+            <div>
+              <div class="fw-semibold">{{ insurerName }}</div>
+              <div class="text-muted small">{{ productName }}</div>
+            </div>
+
+          </div>
+
+          <button class="btn btn-light share-btn" type="button" (click)="sharePlan()">
+            <i class="bi bi-share me-1" aria-hidden="true"></i> Share Plan
+          </button>
+        </div>
+      </section>
+
+      <!-- Video -->
+      <div class="video-wrap mt-3" (click)="startVideo()" role="button" aria-label="Play video">
+        <ng-container *ngIf="!showYouTube; else ytFrame">
+          <img class="video-el" [src]="'https://img.youtube.com/vi/' + youtubeId + '/hqdefault.jpg'"
+            alt="Plan explainer video thumbnail" />
+          <button class="play-overlay" type="button" aria-label="Play">
+            <span class="triangle"></span>
+          </button>
+          <div class="video-ribbon">
+            Let me explain to you what Directors and Officers Liability insurance is...
+          </div>
+        </ng-container>
+
+        <ng-template #ytFrame>
+          <iframe class="video-el" [src]="youtubeUrl" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen
+            title="YouTube video player"></iframe>
+        </ng-template>
+      </div>
+
+      <!-- Tabs -->
+      <ul class="nav nav-tabs plan-tabs mt-3" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button type="button" class="nav-link" [class.active]="activeTab === 'includes'" (click)="setTab('includes')"
+            role="tab" [attr.aria-selected]="activeTab === 'includes'">
+            Includes
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button type="button" class="nav-link" [class.active]="activeTab === 'excludes'" (click)="setTab('excludes')"
+            role="tab" [attr.aria-selected]="activeTab === 'excludes'">
+            Excludes
+          </button>
+        </li>
+
+      </ul>
+
+      <!-- Tabs body -->
+      <div [ngSwitch]="activeTab" [ngClass]="{
+          'card p-4 mt-2': activeTab === 'includes' || activeTab === 'addons',
+          'p-3 mt-2 border-0 bg-transparent': activeTab === 'excludes' || activeTab === 'cashless' || activeTab === 'claim'
+        }">
+
+        <!-- INCLUDES -->
+        <ng-container *ngSwitchCase="'includes'">
+          <h5 class="mb-3">What's included?</h5>
+
+          <ul class="checklist" *ngIf="includesList?.length; else noIncludes">
+            <li *ngFor="let inc of includesList">
+              <span class="check" aria-hidden="true"></span>
+              <div>
+                <div class="item-title">{{ inc }}</div>
+              </div>
+            </li>
+          </ul>
+
+          <ng-template #noIncludes>
+            <p class="text-muted small mb-0">Includes data is not available for this plan.</p>
+          </ng-template>
+        </ng-container>
+
+
+        <!-- EXCLUDES -->
+        <ng-container *ngSwitchCase="'excludes'">
+          <section *ngIf="excludesList?.length; else noExcludes">
+            <div class="excl-card">
+              <ul class="excl-list">
+                <li *ngFor="let ex of excludesList">
+                  <span class="ex-icon" aria-hidden="true">×</span>
+                  <span>{{ ex }}</span>
+                </li>
+              </ul>
+            </div>
+          </section>
+
+          <ng-template #noExcludes>
+            <p class="text-muted small mb-0">Exclusions data is not available for this plan.</p>
+          </ng-template>
+        </ng-container>
+
+
+      </div>
+    </div>
+
+    <!-- RIGHT (sticky) -->
+    <div class="col-lg-4 d-flex flex-column gap-3">
+      <aside class="right-sticky">
+        <!-- Insured Details -->
+        <section class="card p-3 mb-3">
+          <div class="text-muted small mb-2">Insured Details</div>
+          <hr class="my-2" />
+          <div class="d-flex gap-5">
+            <div class="text-body">{{ insured.self }}</div>
+            <div class="text-body">{{ insured.pincode }}</div>
+          </div>
+        </section>
+
+        <!-- Premium Breakup -->
+        <section class="card p-0 overflow-hidden">
+          <div class="total-premium d-flex align-items-center">
+            <div class="text-muted small">Premium Breakup</div>
+          </div>
+
+          <div class="p-3">
+            <div class="premium-options">
+              <label class="premium-option" *ngFor="let opt of premiumOptions" (click)="chooseTenure(opt)">
+                <input type="radio" name="tenure" [checked]="selectedTenure?.id === opt.id" />
+                <span class="opt-label">{{ opt.label }}</span>
+                <span class="opt-amount">{{ opt.display }}</span>
+              </label>
+
+            </div>
+
+            <hr class="my-3" />
+
+            <div class="row g-2 small text-muted">
+              <div class="col-6">Cover Amount</div>
+              <div class="col-6 text-end text-body">{{ coverAmount }}</div>
+
+              <div class="col-6">Members Covered</div>
+              <div class="col-6 text-end text-body">{{ membersCovered }}</div>
+
+              <div class="col-6">Base Premium</div>
+              <div class="col-6 text-end text-body">₹ {{ basePremium | number }}</div>
+
+              <div class="col-6">Discount</div>
+              <div class="col-6 text-end text-body">₹ {{ discount | number }}</div>
+            </div>
+          </div>
+
+          <div class="total-premium d-flex align-items-center justify-content-between">
+            <span>Total Premium</span>
+            <strong>₹ {{ totalPremium | number }}</strong>
+          </div>
+        </section>
+      </aside>
+    </div>
+  </div>
+</div>

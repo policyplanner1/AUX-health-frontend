@@ -1,0 +1,27 @@
+<div class="btn-wrap" [class.has-dropdown]="dropdown">
+  <button
+    [attr.type]="type"
+    [disabled]="disabled"
+    class="btn"
+    [ngClass]="[variant, size, dropdown ? 'is-dropdown' : '']"
+    [attr.aria-haspopup]="dropdown ? 'menu' : null"
+    [attr.aria-expanded]="dropdown ? isOpen : null"
+    (click)="dropdown ? toggleMenu() : null"
+  >
+    <span class="btn-content"><ng-content></ng-content></span>
+
+    <!-- Built-in chevron only when dropdown is enabled -->
+    <i *ngIf="dropdown" class="bi bi-chevron-down chevron" [class.open]="isOpen"></i>
+  </button>
+
+  <!-- Projected dropdown menu -->
+  <div
+    *ngIf="dropdown && isOpen"
+    class="dropdown-menu"
+    role="menu"
+    (click)="onMenuClick()"
+  >
+    <!-- Parent provides any content marked with [menu] -->
+    <ng-content select="[menu]"></ng-content>
+  </div>
+</div>

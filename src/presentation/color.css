@@ -1,0 +1,24 @@
+:root {
+  --primary: #0d6efd;
+  --primary-contrast: #ffffff;
+
+  --secondary: #6c757d;
+  --secondary-contrast: #ffffff;
+
+  --success: #198754;
+  --danger: #dc3545;
+  --warning: #ffc107;
+  --info: #0dcaf0;
+
+  --surface: #ffffff;
+  --text: #212529;
+  --muted: #6c757d;
+  --border: #dee2e6;
+
+  /* 👇 New color */
+  --highlight: #FFC727;
+
+  --edit:#F37435;
+
+}
+

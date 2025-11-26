@@ -1,0 +1,226 @@
+/* ================================
+   Button Component (Plain CSS)
+   File: button.component.css
+   ================================ */
+
+/* Host ensures local scope and predictable layout */
+:host {
+  display: inline-block;
+  /* Allow the button to take full width when .btn--block is applied */
+  width: auto;
+  font-family: inherit;
+}
+
+/* Theme tokens (can be overridden by parent) */
+:host {
+  --btn-font: inherit;
+  --btn-radius: 12px;
+  --btn-fw: 600;
+
+  --btn-h: 40px;
+  --btn-pad-x: 16px;
+  --btn-gap: 8px;
+
+  --btn-fg: #ffffff;
+  --btn-bg: #0d6efd;       /* primary */
+  --btn-bg-hover: #0b5ed7;
+  --btn-bg-active: #0a58ca;
+
+  --btn-secondary-fg: #0b1220;
+  --btn-secondary-bg: #e9eef6;
+  --btn-secondary-hover: #dde6f3;
+  --btn-secondary-active: #d1dceb;
+
+  --btn-outline-fg: #0d6efd;
+  --btn-outline-br: #b9d3ff;
+  --btn-outline-hover: rgba(13, 110, 253, 0.08);
+  --btn-outline-active: rgba(13, 110, 253, 0.14);
+
+  --btn-ghost-fg: #0b1220;
+  --btn-ghost-hover: rgba(11, 18, 32, 0.06);
+  --btn-ghost-active: rgba(11, 18, 32, 0.12);
+
+  --btn-link-fg: #0d6efd;
+
+  --btn-disabled-fg: #9aa3b2;
+  --btn-disabled-bg: #eef2f7;
+  --btn-disabled-br: #e2e8f0;
+
+  --btn-shadow: 0 1px 2px rgba(0,0,0,.06), 0 2px 8px rgba(0,0,0,.08);
+  --btn-shadow-hover: 0 3px 12px rgba(0,0,0,.12);
+}
+
+/* Base button */
+.btn {
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  cursor: pointer;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--btn-gap);
+
+  min-height: var(--btn-h);
+  padding: 0 var(--btn-pad-x);
+  border-radius: var(--btn-radius);
+  border: 1px solid transparent;
+
+  font: var(--btn-fw) 14px/1 var(--btn-font);
+  letter-spacing: .2px;
+  text-decoration: none;
+
+  color: var(--btn-fg);
+  background: var(--btn-bg);
+  box-shadow: var(--btn-shadow);
+
+  transition: background .15s ease, color .15s ease, box-shadow .15s ease,
+              transform .04s ease, border-color .15s ease, opacity .15s ease;
+}
+
+.btn:hover { background: var(--btn-bg-hover); box-shadow: var(--btn-shadow-hover); }
+.btn:active { background: var(--btn-bg-active); transform: translateY(0.5px); }
+
+/* Focus ring (accessible) */
+.btn:focus-visible {
+  outline: 3px solid rgba(13,110,253,.35);
+  outline-offset: 2px;
+}
+
+/* Disabled */
+.btn[disabled],
+.btn.btn--disabled,
+.btn:disabled {
+  cursor: not-allowed;
+  color: var(--btn-disabled-fg);
+  background: var(--btn-disabled-bg);
+  border-color: var(--btn-disabled-br);
+  box-shadow: none;
+  opacity: .9;
+}
+
+/* ========== Variants ========== */
+
+/* Primary (default via base) */
+
+/* Secondary (soft) */
+.btn--secondary {
+  color: var(--btn-secondary-fg);
+  background: var(--btn-secondary-bg);
+  box-shadow: none;
+}
+.btn--secondary:hover { background: var(--btn-secondary-hover); }
+.btn--secondary:active { background: var(--btn-secondary-active); }
+
+/* Outline */
+.btn--outline {
+  color: var(--btn-outline-fg);
+  background: transparent;
+  border-color: var(--btn-outline-br);
+  box-shadow: none;
+}
+.btn--outline:hover { background: var(--btn-outline-hover); }
+.btn--outline:active { background: var(--btn-outline-active); }
+
+/* Ghost (text on subtle bg) */
+.btn--ghost {
+  color: var(--btn-ghost-fg);
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+}
+.btn--ghost:hover { background: var(--btn-ghost-hover); }
+.btn--ghost:active { background: var(--btn-ghost-active); }
+
+/* Link */
+.btn--link {
+  color: var(--btn-link-fg);
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+  padding-left: 0;
+  padding-right: 0;
+}
+.btn--link:hover { text-decoration: underline; }
+
+/* ========== Sizes ========== */
+.btn--sm {
+  --btn-h: 32px;
+  --btn-pad-x: 12px;
+  font-size: 13px;
+  border-radius: 10px;
+}
+
+.btn--lg {
+  --btn-h: 48px;
+  --btn-pad-x: 20px;
+  font-size: 15px;
+  border-radius: 14px;
+}
+
+.btn--xl {
+  --btn-h: 56px;
+  --btn-pad-x: 24px;
+  font-size: 16px;
+  border-radius: 16px;
+}
+
+/* Block / full width */
+.btn--block { display: inline-flex; width: 100%; }
+
+/* Icon handling */
+.btn__icon {
+  display: inline-flex;
+  line-height: 0;
+}
+.btn--icon-only {
+  padding-left: 12px;
+  padding-right: 12px;
+  width: var(--btn-h);
+}
+
+/* Loading state */
+.btn--loading {
+  pointer-events: none;
+  position: relative;
+}
+.btn--loading .btn__label { opacity: 0; }
+.btn--loading::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  animation: btn-spin .7s linear infinite;
+}
+@keyframes btn-spin { to { transform: rotate(360deg); } }
+
+/* Subtle elevation opt-in */
+.btn--elevated { box-shadow: var(--btn-shadow); }
+.btn--elevated:hover { box-shadow: var(--btn-shadow-hover); }
+
+/* High-contrast/dark parent support */
+:host-context(.dark),
+:host-context([data-theme="dark"]) {
+  --btn-secondary-fg: #e6e9ef;
+  --btn-secondary-bg: #1e2633;
+  --btn-secondary-hover: #232c3b;
+  --btn-secondary-active: #263246;
+
+  --btn-ghost-fg: #e6e9ef;
+  --btn-ghost-hover: rgba(230,233,239,.06);
+  --btn-ghost-active: rgba(230,233,239,.12);
+
+  --btn-disabled-fg: #7c8697;
+  --btn-disabled-bg: #222a38;
+  --btn-disabled-br: #2b3547;
+}
+
+/* Compact stacking for small screens */
+@media (max-width: 360px) {
+  .btn { --btn-pad-x: 12px; gap: 6px; }
+}

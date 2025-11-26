@@ -1,0 +1,30 @@
+<div class="plan-card">
+  <!-- Header (right side actions like "Add To Compare") -->
+  <div 
+    class="top-bar" 
+    *ngIf="showHeader" 
+    [ngStyle]="{'background': isFirstCard ? headerBg : 'none'}"
+  >
+    <div class="top-right">
+      <ng-content select="[pc-header-right]"></ng-content>
+    </div>
+  </div>
+
+  <!-- Main content grid -->
+  <div class="row-wrap">
+    <!-- Left column: logo / product title / badges -->
+    <section class="left-sec">
+      <ng-content select="[pc-left]"></ng-content>
+    </section>
+
+    <!-- Middle column: ticks + 'View All Features' -->
+    <section class="mid-sec">
+      <ng-content select="[pc-mid]"></ng-content>
+    </section>
+
+    <!-- Right column: facts + price + brochure -->
+    <section class="right-sec" [style.background]="rightBg">
+      <ng-content select="[pc-right]"></ng-content>
+    </section>
+  </div>
+</div>

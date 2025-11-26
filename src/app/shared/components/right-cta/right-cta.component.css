@@ -1,0 +1,51 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+/* Base Card */
+.card {
+  background: #fff;
+  border: 1px solid #e9ecef;
+  box-sizing: border-box;
+  transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+}
+
+.rounded { border-radius: 12px; }
+
+.clickable { cursor: pointer; }
+.clickable:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 30px rgba(0,0,0,0.08);
+  border-color: #dee2e6;
+}
+
+/* Shadows */
+.shadow-none { box-shadow: none; }
+.shadow-sm   { box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+/* .shadow-lg   { box-shadow: 0 14px 30px rgba(0,0,0,0.10); } */
+
+/* Padding scales */
+.p-none { padding: 0; }
+.p-sm   { padding: 10px; }
+.p-md   { padding: 16px; }
+/* .p-lg   { padding: 24px; } */
+
+/* Sections */
+.card-header { padding-bottom: 8px; border-bottom: 1px solid #f1f3f5; }
+.card-title  { font-size: 1.05rem; margin: 0; font-weight: 600; }
+.card-body   { /* body already gets padding from .p-* on article */ }
+.card-footer { margin-top: 12px; padding-top: 8px; border-top: 1px solid #f1f3f5; }
+
+/* Stretch card to fill height when needed */
+.h-full { height: 100%; }
+
+/* Responsive helpers: parent grid controls columns; card is fluid */
+@media (max-width: 576px) {
+  .card-title { font-size: 1rem; }
+}
+
+.article{
+  /* backgroundurl:('/assets/quote/star.svg') no-repeat center; */
+      background-image: radial-gradient(black, transparent);
+}
