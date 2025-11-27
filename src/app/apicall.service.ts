@@ -1,8 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { forkJoin, of, Observable, throwError } from 'rxjs';
+import { forkJoin, of, Observable, throwError, from } from 'rxjs';
 import { catchError, timeout } from 'rxjs/operators';
 import { environment } from 'src/environment';
+import { db } from '../firebaseConfig';
+import { collection, addDoc } from 'firebase/firestore';
+
 
 @Injectable({
   providedIn: 'root'
@@ -46,8 +49,22 @@ export class ApicallService {
     return params;
   }
 
-    saveHealthProposal(payload: any): Observable<any> {
-    return this.http.post(`${this.BASE_URL}/proposals/save`, payload);
+    saveHealthProposal(payload: any) {
+    const apiCall = this.http.post(`${this.BASE_URL}/proposals/save`, payload);
+
+   const firebasePayload = {
+    ...payload,
+    lead_type: "health",
+  };
+
+  const firebaseCall = from(
+    addDoc(collection(db, 'AUX_leads'), firebasePayload)
+  );
+
+    return forkJoin({
+      api: apiCall,
+      firebase: firebaseCall
+    });
   }
 
   /** ✅ Step 1: Get all available health plan endpoints */
