@@ -6,7 +6,6 @@ import { environment } from 'src/environment';
 import { db } from '../firebaseConfig';
 import { collection, addDoc } from 'firebase/firestore';
 
-
 @Injectable({
   providedIn: 'root'
 })
