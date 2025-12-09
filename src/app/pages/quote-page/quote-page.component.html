@@ -94,136 +94,138 @@
   <img class="quote-count__gif" src="assets/heading-arrow.gif" alt="gif">
 </p>
 
-<div class="container" *ngIf="!isCompareOpen">
-  <div class="row mt-3">
+<div class="container quotes-plans-layout" *ngIf="!isCompareOpen">
+  <div class="row mt-3 quotes-plans-row">
+
     <!-- LEFT (plans list, GROUPED BY INSURER) -->
     <div class="col-md-9">
       <div class="plans-scroll">
-        <ng-container *ngFor="let group of groupedResults; trackBy: trackByInsurer">
-          <div class="insurer-group bg-white p-2 rounded-2xl shadow-md">
-            <div class="insurer-cards">
-              <ng-container *ngFor="let plan of (group.showAll ? group.plans : group.plans | slice:0:1)">
-                <app-plan-card [isFirstCard]="true">
-                  <!-- header right -->
-                  <div pc-header-right class="d-inline-flex align-items-center gap-2">
-                    Add To Compare
-                    <input type="checkbox"
-                           [checked]="isSelected(plan)"
-                           (change)="onCompareToggle(plan, $event)" />
-                  </div>
+       <ng-container *ngFor="let plan of displayedResults; trackBy: trackByPlan">
+  <app-plan-card [isFirstCard]="true">
 
-                  <!-- left content -->
-                  <div pc-left>
-                    <img [src]="'/assets/quote/' + group.plans[0].company.logo"
-                         [alt]="group.plans[0].company.company_name"
-                         style="width:80px;">
+    <!-- header right -->
+    <div pc-header-right class="d-inline-flex align-items-center gap-2">
+      Add To Compare
+      <input type="checkbox"
+             [checked]="isSelected(plan)"
+             (change)="onCompareToggle(plan, $event)" />
+    </div>
 
-                    <h5 style="margin:10px 4px 6px;">{{ plan.planName }}</h5>
+    <!-- left content -->
+    <div pc-left>
+      <img
+        [src]="'/assets/quote/' + plan?.company?.logo"
+        [alt]="plan?.company?.company_name"
+        style="width:80px;"
+      >
 
-                    <div class="benefit-badge" *ngIf="plan.features?.length">
-                      <img src="assets/quote/circleOrange.svg" class="benefit-icon">
-                      <span class="badge-text">{{ plan.features[0].includes }}</span>
-                    </div>
-                  </div>
+      <h5 style="margin:10px 4px 6px;">{{ plan.planName }}</h5>
 
-                  <!-- middle content -->
-                  <div pc-mid *ngIf="plan.features?.length > 0">
-                    <ul class="pcs-ticks">
-                      <li *ngFor="let t of plan.features?.slice(0,3)">
-                        <img src="assets/quote/right.svg" alt="" />
-                        {{ t?.includes }}
-                      </li>
-                    </ul>
+      <div class="benefit-badge" *ngIf="plan.features?.length">
+        <img src="assets/quote/circleOrange.svg" class="benefit-icon">
+        <span class="badge-text">{{ plan?.company?.company_name }}</span>
+      </div>
+    </div>
 
-                    <p class="viewmore" (click)="goToAllFeatures(plan)">
-                      All features
-                    </p>
-                  </div>
+    <!-- middle content -->
+    <div pc-mid *ngIf="plan.features?.length > 0">
+      <ul class="pcs-ticks">
+        <li *ngFor="let t of plan.features?.slice(0,3)">
+          <img src="assets/quote/right.svg" alt="" />
+          {{ t?.includes }}
+        </li>
+      </ul>
 
-                  <!-- right content -->
-                  <div pc-right>
-                    <div class="pcs-facts"
-                         style="margin-bottom:10px; display:flex; flex-direction:column; align-items:center; text-align:center;">
-                      <div class="pcs-fact">
-                        <div class="label" style="font-size:0.9rem; color:#555;">Cover Amount</div>
-                        <div class="value"
-                             style="font-weight:600; font-size:1.1rem; display:flex; align-items:center; justify-content:center; gap:4px;">
-                          ₹ {{ plan.coverAmount | number:'1.0-0':'en-IN' }}
-                          <i class="bi bi-chevron-down"></i>
-                        </div>
-                      </div>
-                    </div>
+      <p class="viewmore" (click)="goToAllFeatures(plan)">
+        All features
+      </p>
+    </div>
 
-                    <div class="pcs-buy-now">
-                      <button class="cmp-buy mb-2" (click)="goToBuyNow(plan)">
-                        Buy Now ₹{{ plan.totalPayablePremium | number:'1.0-0':'en-IN'}}/Year
-                      </button>
-                    </div>
-
-                    <div class="download" *ngIf="plan.plan?.broucher">
-                      <a class="pcs-link" [href]="plan.plan.broucher" download>
-                        Download Brochure
-                      </a>
-                      <img src="assets/quote/download.svg" alt="" />
-                    </div>
-                  </div>
-                </app-plan-card>
-              </ng-container>
-            </div>
+    <!-- right content -->
+    <div pc-right>
+      <div class="pcs-facts"
+           style="margin-bottom:10px; display:flex; flex-direction:column; align-items:center; text-align:center;">
+        <div class="pcs-fact">
+          <div class="label" style="font-size:0.9rem; color:#555;">Cover Amount</div>
+          <div class="value"
+               style="font-weight:600; font-size:1.1rem; display:flex; align-items:center; justify-content:center; gap:4px;">
+            ₹ {{ formatCoverAmount(plan.coverAmount) }}
+            <i class="bi bi-chevron-down"></i>
           </div>
-        </ng-container>
+        </div>
+      </div>
+
+      <div class="pcs-buy-now">
+        <button class="cmp-buy mb-2" (click)="goToBuyNow(plan)">
+          Buy Now ₹{{ plan.totalPayablePremium | number:'1.0-0':'en-IN'}}/Year
+        </button>
+      </div>
+
+      <div class="download" *ngIf="plan.plan?.broucher">
+        <a class="pcs-link" [href]="plan.plan.broucher" download>
+          Download Brochure
+        </a>
+        <img src="assets/quote/download.svg" alt="" />
       </div>
     </div>
 
-    <!-- RIGHT (CTA) – SUPER TOPUP STYLE -->
-    <div class="col-md-3">
-      <!-- CALL ME BOX -->
-      <div class="cta-st-box">
-        <div class="cta-st-avatar">
-          <img src="assets/quote/profile.svg" alt="Expert">
-        </div>
-        <h4 class="cta-st-title">Ready to get insured?</h4>
-        <p class="cta-st-desc">
-          Our experts will call you, explain the options, and help you buy the right policy
-        </p>
+  </app-plan-card>
+</ng-container>
 
-        <div class="cta-st-input-box">
-          <input type="text" value="+91 7798612243" class="cta-st-input">
-          <a href="tel:+91-7798612243">
-            <button class="cta-st-call-btn">Call Me</button>
-          </a>
-        </div>
-      </div>
-
-      <!-- INFO TILES -->
-      <div class="cta-st-icons-row mt-4">
-        <div class="cta-st-icon">
-          <img src="assets/quote/registration.svg">
-          <p>IRDAI Registered</p>
-        </div>
-        <div class="cta-st-icon">
-          <img src="assets/quote/claim.svg">
-          <p>Fast Claim process</p>
-        </div>
-        <div class="cta-st-icon">
-          <img src="assets/quote/call.svg">
-          <p>Expert Guidance</p>
-        </div>
-      </div>
-
-      <!-- CSR BOX -->
-      <div class="cta-st-csr-box">
-        <img src="assets/quote/heart.svg" class="csr-img">
-        <p class="csr-title">High CSR = higher peace of mind</p>
-        <p class="csr-desc">
-          A higher Claim Settlement Ratio (ideally 95%+) means more claims get paid.
-          Also check how fast claims are settled and consistency across the last few years.
-        </p>
-        <div class="csr-bottom-strip"></div>
       </div>
     </div>
+
+   <!-- RIGHT (CTA) – SUPER TOPUP STYLE -->
+<div class="col-md-3 right-cta-sticky">
+  <!-- <div class="right-cta-sticky"> -->
+
+    <!-- CALL ME BOX -->
+    <div class="cta-st-box">
+      <div class="cta-st-avatar">
+        <img src="assets/quote/profile.svg" alt="Expert">
+      </div>
+      <h4 class="cta-st-title">Ready to get insured?</h4>
+      <p class="cta-st-desc">
+        Our experts will call you, explain the options, and help you buy the right policy
+      </p>
+
+      <div class="cta-st-input-box">
+        <input type="text" value="+91 7798612243" class="cta-st-input">
+        <a href="tel:+91-7798612243">
+          <button class="cta-st-call-btn">Call Me</button>
+        </a>
+      </div>
+    </div>
+
+    <!-- INFO TILES -->
+    <div class="cta-st-icons-row mt-4">
+      <div class="cta-st-icon">
+        <img src="assets/quote/registration.svg">
+        <p>IRDAI Registered</p>
+      </div>
+      <div class="cta-st-icon">
+        <img src="assets/quote/claim.svg">
+        <p>Fast Claim process</p>
+      </div>
+      <div class="cta-st-icon">
+        <img src="assets/quote/call.svg">
+        <p>Expert Guidance</p>
+      </div>
+    </div>
+
+    <!-- CSR BOX -->
+    <div class="cta-st-csr-box">
+      <img src="assets/quote/heart.svg" class="csr-img">
+      <p class="csr-title">High CSR = higher peace of mind</p>
+      <p class="csr-desc">
+        A higher Claim Settlement Ratio (ideally 95%+) means more claims get paid.
+        Also check how fast claims are settled and consistency across the last few years.
+      </p>
+      <div class="csr-bottom-strip"></div>
+    </div>
+
   </div>
-</div>
+
 
 <!-- === FIXED BOTTOM COMPARE BAR - RESPONSIVE === -->
 <div class="compare-bar" *ngIf="compare.length > 0 && !isCompareOpen">
@@ -319,12 +321,13 @@
               <div class="cmp-cover-section">
                 <div class="cmp-cover-label">Cover Amount</div>
                 <div class="cmp-cover-value">
-                  ₹ {{ p.coverAmount | number:'1.0-0':'en-IN' }}
+₹ {{ formatCoverAmount(p.coverAmount) }}
                 </div>
               </div>
 
               <button class="cmp-buy-now-btn" (click)="goToBuyNow(p)">
-                Buy now for ₹{{ p.monthlyPrice | number:'1.0-0':'en-IN' }}
+                Buy now for ₹{{ formatCoverAmount(p.monthlyPrice) }}
+
               </button>
             </div>
           </div>

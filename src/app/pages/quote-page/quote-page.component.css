@@ -1904,3 +1904,58 @@
     padding-left: 0; /* since arrow is inside flow now */
   }
 }
+/* =========================================================
+   DESKTOP: ONLY LEFT PLANS SCROLL, RIGHT CTA STAYS FIXED
+   ========================================================= */
+/* =========================================================
+   ✅ ONLY RIGHT CTA STICKY (FULL PAGE SCROLL ENABLED)
+   ========================================================= */
+
+.quotes-plans-layout {
+  height: auto !important;
+  overflow: visible !important;
+}
+
+@media (min-width: 992px) {
+  .quotes-plans-row {
+    align-items: flex-start;
+  }
+
+  .right-cta-sticky {
+    position: sticky;
+    top: 16px; /* adjust if you want more space from top */
+  }
+}
+
+/* Optional: ensure Compare bar doesn't overlap last content */
+body {
+  padding-bottom: 120px;
+}
+
+
+
+/* =========================================================
+   MOBILE/TABLET: NORMAL FLOW
+   ========================================================= */
+@media (max-width: 991.98px) {
+  .quotes-plans-layout {
+    height: auto;
+    overflow: visible;
+  }
+
+  .quotes-left-col {
+    height: auto;
+    overflow: visible;
+    padding-right: 0;
+  }
+
+  .right-cta-sticky {
+    position: static !important;
+  }
+}
+
+.sticky-col{
+  position: sticky;
+  top:0;
+  height: 100vh;
+  }

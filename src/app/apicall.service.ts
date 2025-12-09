@@ -130,7 +130,7 @@ export class ApicallService {
      * You can add your existing health quote API path here later
      */
     getHealthQuotes(query: Record<string, any> = {}): Observable < any > {
-      const healthUrl = this.buildUrl('api/health'); // example path for health quotes
+      const healthUrl = this.buildUrl('api/health');
       const params = this.toHttpParams(query);
 
       return this.http
@@ -142,6 +142,14 @@ export class ApicallService {
             return throwError(() => err);
           })
         );
+    }
+
+      sendOtp(mobile: string) {
+      return this.http.post<any>(`${this.BASE_URL}/otp/send-otp`, { mobile });
+    }
+
+    verifyOtp(mobile: string, otp: string) {
+      return this.http.post<any>(`${this.BASE_URL}/otp/verify-otp`, { mobile, otp });
     }
 
   }

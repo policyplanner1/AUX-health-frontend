@@ -44,14 +44,19 @@ type PlanPayload = {
   styleUrls: ['./quote-page.component.css']
 })
 export class QuotePageComponent implements OnInit {
-  groupedResults: any[] = [];
-  expandedInsurers: Set<string> = new Set();
+  trackByPlan = (_: number, plan: any) =>
+  plan?.planId ?? plan?.id ?? plan?.planName ?? _;
+
+  // groupedResults: any[] = [];
+  // expandedInsurers: Set<string> = new Set();
   results: any[] = [];
   isLoading = false;
   age: number | null = null;
   pincode = '';
   selectedInsurer = '';
-  allGroupedResults: any[] = [];
+  // allGroupedResults: any[] = [];
+  displayedResults: any[] = [];
+
   insurerOptions: string[] = [];
   sortOption: string = 'lowToHigh';
   userName: string = '';
@@ -70,9 +75,10 @@ export class QuotePageComponent implements OnInit {
 
 
   // ✅ Total plans count for heading
-  get totalPlansCount(): number {
-    return this.results?.length || 0;
-  }
+ get totalPlansCount(): number {
+  return this.displayedResults?.length || 0;
+}
+
 
 ngOnInit(): void {
 
@@ -98,7 +104,7 @@ ngOnInit(): void {
       zone: "1"
     };
 
-    // localStorage.setItem('healthFormData', JSON.stringify(raw));
+    localStorage.setItem('healthFormData', JSON.stringify(raw));
     const savedData = localStorage.getItem('healthFormData');
 
     if (savedData) {
@@ -145,6 +151,25 @@ ngOnInit(): void {
   }
 
   // ---- helpers ----
+//   private groupPlansByCompanyPreserveOrder(plans: any[]) {
+//   const map = new Map<string, any[]>();
+
+//   for (const plan of plans) {
+//     const key = String(plan.companyId ?? plan.company?.company_id ?? plan.company?.id ?? 'unknown');
+
+//     if (!map.has(key)) {
+//       map.set(key, []);
+//     }
+//     map.get(key)!.push(plan);
+//   }
+
+//   return Array.from(map.entries()).map(([companyId, groupedPlans]) => ({
+//     companyId,
+//     plans: groupedPlans,
+//     showAll: true
+//   }));
+// }
+
   private toNum(v: any, d = 0): number {
     const n = Number(v);
     return Number.isFinite(n) ? n : d;
@@ -185,6 +210,68 @@ ngOnInit(): void {
     };
   }
 
+
+private parsePremium(raw: any): number {
+  if (raw === null || raw === undefined) return Number.POSITIVE_INFINITY;
+
+  if (typeof raw === 'number') {
+    return Number.isFinite(raw) ? raw : Number.POSITIVE_INFINITY;
+  }
+
+  // remove ₹, commas, spaces, /year etc.
+  const cleaned = String(raw).replace(/[^0-9.]/g, '');
+  const num = Number(cleaned);
+
+  return Number.isFinite(num) ? num : Number.POSITIVE_INFINITY;
+}
+
+private getPlanPremium(p: any): number {
+  // fallback keys for safety
+  const raw =
+    p?.totalPayablePremium ??
+    p?.yearlyPremium ??
+    p?.annualPremium ??
+    p?.premium ??
+    p?.total_premium ??
+    p?.totalPremium ??
+    null;
+
+  return this.parsePremium(raw);
+}
+
+private applyListView(): void {
+  let list = [...(this.results || [])];
+
+  // ✅ insurer filter (GLOBAL)
+  if (this.selectedInsurer) {
+    list = list.filter(
+      (p: any) => p?.company?.company_name === this.selectedInsurer
+    );
+  }
+
+  // ✅ default sort safety
+  if (!this.sortOption) {
+    this.sortOption = 'lowToHigh';
+  }
+
+  // ✅ GLOBAL sort (overall list)
+  list.sort((a: any, b: any) => {
+    const pa = this.getPlanPremium(a);
+    const pb = this.getPlanPremium(b);
+
+    if (this.sortOption === 'lowToHigh') return pa - pb;
+    if (this.sortOption === 'highToLow') return pb - pa;
+    return 0;
+  });
+
+  this.displayedResults = list;
+}
+
+// private getMinPremium(group: any): number {
+//   if (!group?.plans?.length) return Number.POSITIVE_INFINITY;
+//   return Math.min(...group.plans.map((p: any) => this.getPlanPremium(p)));
+// }
+
 goBack(): void {
     // Try real browser back first
     if (window.history.length > 1) {
@@ -201,19 +288,19 @@ goBack(): void {
         const apiList = response?.data?.map((item: any) => item.api_type) || [];
 
         this.api.callAllPremiumApis(apiList, payload).subscribe({
-          next: (resArray) => {
-            // ✅ Filter out failed/null responses
-            this.results = resArray.filter((res: any) => res && res.planName);
-            console.log('Aggregated Results:', this.results);
-            this.groupedResults = this.groupPlansByCompany(this.results);
-            console.log('Grouped Results:', this.groupedResults);
-            this.allGroupedResults = [...this.groupedResults];
-            this.buildInsurerOptions();
-            this.applyInsurerFilter();
-            this.applySort();
+        next: (resArray) => {
+  this.results = resArray.filter((res: any) => res && res.planName);
+  console.log('Aggregated Results:', this.results);
 
-            this.isLoading = false;
-          },
+  // ✅ insurer dropdown build from full results
+  this.buildInsurerOptions();
+
+  // ✅ apply GLOBAL filter + GLOBAL sort
+  this.applyListView();
+
+  this.isLoading = false;
+},
+
           error: (err) => {
             console.error('Error calling premium APIs:', err);
             this.isLoading = false;
@@ -255,50 +342,19 @@ getGridTemplateColumns(): string {
 }
 
 
-  onSortChange(): void {
-    this.applySort();
-  }
-
- private applySort(): void {
-  if (!this.groupedResults || !this.groupedResults.length) return;
-
-  // ✅ Safety: if user hasn't touched dropdown, keep default low-to-high
-  if (!this.sortOption) {
-    this.sortOption = 'lowToHigh';
-  }
-
-  // 1) sort plans INSIDE each group
-  this.groupedResults.forEach((group: any) => {
-    if (group.plans && Array.isArray(group.plans)) {
-      group.plans.sort((a: any, b: any) => {
-        const pa = Number(a.totalPayablePremium) || 0;
-        const pb = Number(b.totalPayablePremium) || 0;
-
-        if (this.sortOption === 'lowToHigh') return pa - pb;
-        if (this.sortOption === 'highToLow') return pb - pa;
-        return 0;
-      });
-    }
-  });
-
-  // 2) sort the groups themselves based on their CHEAPEST plan
-  this.groupedResults.sort((g1: any, g2: any) => {
-    const min1 = this.getMinPremium(g1);
-    const min2 = this.getMinPremium(g2);
-
-    if (this.sortOption === 'lowToHigh') return min1 - min2;
-    if (this.sortOption === 'highToLow') return min2 - min1;
-    return 0;
-  });
+ onSortChange(): void {
+  this.applyListView();
 }
 
 
-  private getMinPremium(group: any): number {
-    if (!group || !group.plans || !group.plans.length) return Number.POSITIVE_INFINITY;
-    return Math.min(
-      ...group.plans.map((p: any) => Number(p.totalPayablePremium) || 0)
-    );
-  }
+
+
+  // private getMinPremium(group: any): number {
+  //   if (!group || !group.plans || !group.plans.length) return Number.POSITIVE_INFINITY;
+  //   return Math.min(
+  //     ...group.plans.map((p: any) => Number(p.totalPayablePremium) || 0)
+  //   );
+  // }
 
   onCoverageChange(): void {
     if (!this.basePayload) return;
@@ -316,66 +372,51 @@ getGridTemplateColumns(): string {
   }
 
   // Build unique insurer list
-  buildInsurerOptions(): void {
-    const set = new Set<string>();
+ buildInsurerOptions(): void {
+  const set = new Set<string>();
 
-    this.groupedResults.forEach((group: any) => {
-      group.plans?.forEach((p: any) => {
-        const name = p.company?.company_name;
-        if (name) {
-          set.add(name);
-        }
-      });
-    });
+  (this.results || []).forEach((p: any) => {
+    const name = p?.company?.company_name;
+    if (name) set.add(name);
+  });
 
-    this.insurerOptions = Array.from(set).sort(); // optional .sort()
-    console.log('Insurer Options:', this.insurerOptions);
-  }
+  this.insurerOptions = Array.from(set).sort();
+}
 
-  onInsurerChange(): void {
-    this.applyInsurerFilter();
-  }
-
-  applyInsurerFilter(): void {
-    if (!this.selectedInsurer) {
-      this.groupedResults = [...this.allGroupedResults];
-      return;
-    }
-
-    this.groupedResults = this.allGroupedResults.filter((group: any) =>
-      group.plans?.some(
-        (p: any) => p.company?.company_name === this.selectedInsurer
-      )
-    );
-
-    this.applySort();
-
-  }
+ onInsurerChange(): void {
+  this.applyListView();
+}
 
 
-  groupPlansByCompany(plans: any[]) {
-    const grouped: any = {};
-    plans.forEach(plan => {
-      if (!grouped[plan.companyId]) grouped[plan.companyId] = [];
-      grouped[plan.companyId].push(plan);
-    });
 
-    // Convert to array format for easier *ngFor
-    return Object.keys(grouped).map(companyId => ({
-      companyId,
-      plans: grouped[companyId],
-      showAll: true
-    }));
-  }
 
-  toggleCompanyPlans(group: any) {
-    group.showAll = !group.showAll;
-  }
+
+  // groupPlansByCompany(plans: any[]) {
+  //   const grouped: any = {};
+  //   plans.forEach(plan => {
+  //     if (!grouped[plan.companyId]) grouped[plan.companyId] = [];
+  //     grouped[plan.companyId].push(plan);
+  //   });
+
+  //   // Convert to array format for easier *ngFor
+  //   return Object.keys(grouped).map(companyId => ({
+  //     companyId,
+  //     plans: grouped[companyId],
+  //     showAll: true
+  //   }));
+  // }
+
+  // toggleCompanyPlans(group: any) {
+  //   group.showAll = !group.showAll;
+  // }
 
   // Inside your component.ts file
   getVisibleFeatures(plan: any) {
     if (!plan?.features) return [];
 
+    if (plan.showAll === undefined) {
+    plan.showAll = false; // ✅ default
+  }
     // Filter out null, undefined, or empty includes
     const validFeatures = plan.features.filter(
       (t: any) => t && t.includes && t.includes.trim() !== ''
@@ -405,7 +446,7 @@ goToAllFeatures(plan: any) {
   }
 
   // TrackBys expected by template
-  trackByInsurer = (_: number, g: { insurer: string }) => g.insurer;
+// trackByInsurer = (_: number, g: any) => g.companyId;
 
   // Slides expected by template
   infoSlides = [
