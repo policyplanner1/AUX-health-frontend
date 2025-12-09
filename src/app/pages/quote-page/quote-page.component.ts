@@ -4,6 +4,7 @@ import { ApicallService } from 'src/app/apicall.service';
 import { Router } from '@angular/router';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
+import { Location } from '@angular/common';
 
 
 interface Plan {
@@ -52,7 +53,7 @@ export class QuotePageComponent implements OnInit {
   selectedInsurer = '';
   allGroupedResults: any[] = [];
   insurerOptions: string[] = [];
-  sortOption: string = '';
+  sortOption: string = 'lowToHigh';
   userName: string = '';
   familyCount: number = 1;
   adultCount: number | null = null;
@@ -63,92 +64,85 @@ export class QuotePageComponent implements OnInit {
   constructor(
     private router: Router,
     private route: ActivatedRoute,
-    private api: ApicallService
+    private api: ApicallService,
+    private location: Location
   ) { }
 
- ngOnInit(): void {
-  // 1) Prefer localStorage (TEST DATA ONLY – remove before pushing to server)
-  const raw = {
-    Age: "39",
-    cover_amount: "1000000",
-    cover_for: "1000",
-    cust_Pincode: "416404",
-    cust_city: "Cupidatat quis in si",
-    cust_fname: "LEVI",
-    cust_lname: "HALEY",
-    cust_mobile: "9898989898",
-    daughterCount: "2",
-    gender: "Male",
-    self: "",
-    spouse: "on",
-    SAge: "27",
-    sonCount: "",
-    zone: "1"
-  };
 
-  // localStorage.setItem('healthFormData', JSON.stringify(raw));
-  const savedData = localStorage.getItem('healthFormData');
+  // ✅ Total plans count for heading
+  get totalPlansCount(): number {
+    return this.results?.length || 0;
+  }
 
-  if (savedData) {
-    try {
-      const parsed = JSON.parse(savedData);
+ngOnInit(): void {
 
-      // ---- NAME FOR TOP-LEFT STRIP ----
-      this.userName = `${(parsed.cust_fname || '').trim()} ${(parsed.cust_lname || '').trim()}`.trim();
+    // ✅ Ensure default sort on first entry to quotes page
+    this.sortOption = 'lowToHigh';
 
-      // ---- CHILD COUNT (sons + daughters) ----
-      const sons = Number(parsed.sonCount || 0);
-      const daughters = Number(parsed.daughterCount || 0);
-      this.childCount = sons + daughters;
+    // 1) Prefer localStorage (TEST DATA ONLY – remove before pushing to server)
+    const raw = {
+      Age: "39",
+      cover_amount: "1000000",
+      cover_for: "1000",
+      cust_Pincode: "416404",
+      cust_city: "Cupidatat quis in si",
+      cust_fname: "LEVI",
+      cust_lname: "HALEY",
+      cust_mobile: "9898989898",
+      daughterCount: "2",
+      gender: "Male",
+      self: "",
+      spouse: "on",
+      SAge: "27",
+      sonCount: "",
+      zone: "1"
+    };
 
-      // ---- ADULT COUNT BASED ON SELECTED CARDS ----
-      const isOn = (val: any) =>
-        val === 'on' || val === true || val === 1;
+    // localStorage.setItem('healthFormData', JSON.stringify(raw));
+    const savedData = localStorage.getItem('healthFormData');
 
-      let adults = 0;
+    if (savedData) {
+      try {
+        const parsed = JSON.parse(savedData);
 
-      // Self card
-      if (isOn(parsed.self)) {
-        adults++;
+        // ---- NAME FOR TOP-LEFT STRIP ----
+        this.userName = `${(parsed.cust_fname || '').trim()} ${(parsed.cust_lname || '').trim()}`.trim();
+
+        // ---- CHILD COUNT (sons + daughters) ----
+        const sons = Number(parsed.sonCount || 0);
+        const daughters = Number(parsed.daughterCount || 0);
+        this.childCount = sons + daughters;
+
+        // ---- ADULT COUNT BASED ON SELECTED CARDS ----
+        const isOn = (val: any) => val === 'on' || val === true || val === 1;
+
+        let adults = 0;
+        if (isOn(parsed.self)) adults++;
+        if (isOn(parsed.spouse) && parsed.SAge) adults++;
+
+        this.adultCount = adults;
+        this.familyCount = (this.adultCount || 0) + (this.childCount || 0);
+
+        // ---- Build payload & fetch plans ----
+        const payload = this.buildPayloadFromLocal(parsed);
+        this.basePayload = payload;
+
+        this.selectedCoverageAmt = payload.coverAmount || null;
+
+        this.age = payload.age ?? null;
+        this.pincode = parsed.cust_Pincode ?? '';
+
+        this.fetchAllPlans(payload);
+        return;
+
+      } catch (e) {
+        console.warn(
+          'Failed to parse localStorage healthFormData, falling back to query params.',
+          e
+        );
       }
-
-      // Spouse card (we also have spouse age as SAge)
-      if (isOn(parsed.spouse) && parsed.SAge) {
-        adults++;
-      }
-
-      // OPTIONAL fallback: if no adult card is ON but Age exists, treat as 1 adult
-      // (uncomment if you want this behaviour)
-      /*
-      if (adults === 0 && (parsed.Age || parsed.age)) {
-        adults = 1;
-      }
-      */
-
-      this.adultCount = adults;
-
-      // ---- FINAL FAMILY SIZE ----
-      this.familyCount = (this.adultCount || 0) + (this.childCount || 0);
-
-      // ---- Build payload & fetch plans (existing logic) ----
-      const payload = this.buildPayloadFromLocal(parsed);
-      this.basePayload = payload;
-      this.selectedCoverageAmt = payload.coverAmount || null;
-
-      this.age = payload.age ?? null;
-      this.pincode = parsed.cust_Pincode ?? '';
-
-      this.fetchAllPlans(payload);
-      return;
-
-    } catch (e) {
-      console.warn(
-        'Failed to parse localStorage healthFormData, falling back to query params.',
-        e
-      );
     }
   }
-}
 
   // ---- helpers ----
   private toNum(v: any, d = 0): number {
@@ -191,7 +185,15 @@ export class QuotePageComponent implements OnInit {
     };
   }
 
-
+goBack(): void {
+    // Try real browser back first
+    if (window.history.length > 1) {
+      this.location.back();
+    } else {
+      // Fallback: navigate to the correct previous page route
+      this.router.navigate(['/health-insurance.php']); // <-- change to your actual route
+    }
+  }
   fetchAllPlans(payload: any) {
     this.isLoading = true;
     this.api.getHealthPlanEndpoints().subscribe({
@@ -257,39 +259,39 @@ getGridTemplateColumns(): string {
     this.applySort();
   }
 
-  private applySort(): void {
-    if (!this.groupedResults || !this.groupedResults.length) return;
+ private applySort(): void {
+  if (!this.groupedResults || !this.groupedResults.length) return;
 
-    // 1) sort plans INSIDE each group
-    this.groupedResults.forEach((group: any) => {
-      if (group.plans && Array.isArray(group.plans)) {
-        group.plans.sort((a: any, b: any) => {
-          const pa = Number(a.totalPayablePremium) || 0;
-          const pb = Number(b.totalPayablePremium) || 0;
-
-          if (this.sortOption === 'lowToHigh') {
-            return pa - pb;
-          } else if (this.sortOption === 'highToLow') {
-            return pb - pa;
-          }
-          return 0;
-        });
-      }
-    });
-
-    // 2) sort the groups themselves based on their CHEAPEST plan
-    this.groupedResults.sort((g1: any, g2: any) => {
-      const min1 = this.getMinPremium(g1);
-      const min2 = this.getMinPremium(g2);
-
-      if (this.sortOption === 'lowToHigh') {
-        return min1 - min2;
-      } else if (this.sortOption === 'highToLow') {
-        return min2 - min1;
-      }
-      return 0; // no sorting if "" (default)
-    });
+  // ✅ Safety: if user hasn't touched dropdown, keep default low-to-high
+  if (!this.sortOption) {
+    this.sortOption = 'lowToHigh';
   }
+
+  // 1) sort plans INSIDE each group
+  this.groupedResults.forEach((group: any) => {
+    if (group.plans && Array.isArray(group.plans)) {
+      group.plans.sort((a: any, b: any) => {
+        const pa = Number(a.totalPayablePremium) || 0;
+        const pb = Number(b.totalPayablePremium) || 0;
+
+        if (this.sortOption === 'lowToHigh') return pa - pb;
+        if (this.sortOption === 'highToLow') return pb - pa;
+        return 0;
+      });
+    }
+  });
+
+  // 2) sort the groups themselves based on their CHEAPEST plan
+  this.groupedResults.sort((g1: any, g2: any) => {
+    const min1 = this.getMinPremium(g1);
+    const min2 = this.getMinPremium(g2);
+
+    if (this.sortOption === 'lowToHigh') return min1 - min2;
+    if (this.sortOption === 'highToLow') return min2 - min1;
+    return 0;
+  });
+}
+
 
   private getMinPremium(group: any): number {
     if (!group || !group.plans || !group.plans.length) return Number.POSITIVE_INFINITY;
@@ -587,6 +589,7 @@ goToAllFeatures(plan: any) {
     this.isCompareOpen = false;
   }
 
+
   goToBuyNow(plan: any) {
     // You can send plan details if needed
     this.router.navigate(['/buy-now'], { state: { selectedPlan: plan } });
@@ -598,9 +601,7 @@ goToAllFeatures(plan: any) {
   trackByRow(index: number, row: any) {
     return row.label;
   }
-  /* -------------------------------------------------------
-      🚀 PDF DOWNLOAD FUNCTION (ONLY ADDITION)
-  --------------------------------------------------------*/
+
   /* -------------------------------------------------------
       🚀 PDF DOWNLOAD FUNCTION
   --------------------------------------------------------*/
@@ -716,9 +717,6 @@ downloadPDF() {
         tableWrapper.style.width = prevTwWidth;
       }
     });
-}
-
-
-
+  }
 }
 

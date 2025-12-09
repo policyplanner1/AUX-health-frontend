@@ -1602,6 +1602,55 @@
   }
 
 }
+.quotes-back-arrow {
+  position: absolute;
+  top: 14px;
+  left: 10px;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  z-index: 2000;
+}
+
+.quote-count {
+  font-size: 14px;
+  color: #6b7280; /* similar soft gray */
+}
+
+.quote-count__number {
+  color: #006D8D;
+  font-weight: 600;
+}
+
+.quote-count__gif {
+  width: 34px;
+  height: 34px;
+  display: inline-block;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+
+@media (min-width: 768px) {
+  .quote-count {
+    font-size: 18px;
+  }
+}
+
+
+.quotes-back-arrow svg {
+  width: 22px;
+  height: 22px;
+  color: #006d8d; /* same theme color */
+}
+
+@media (max-width: 576px) {
+  .quotes-back-arrow {
+    top: 10px;
+    left: 6px;
+  }
+}
+
 /* ========================================== PDF LINE BREAK FIX ========================================== */
 /* ========================================== PDF PAGE BREAK FIX ========================================== */
 #compareWrapper.export-pdf .cmp-table-body .cmp-row {
@@ -1674,5 +1723,184 @@
     font-size: 12px;
     padding: 10px 8px;
     line-height: 1.4;
+  }
+}
+
+/* =========================================================
+   QUOTES HEADER + BREADCRUMBS + FILTER STRIP RESPONSIVE FIX
+   Add this at the END of your stylesheet
+   ========================================================= */
+
+/* Anchor absolute back button safely */
+.main-quotes-wrapper,
+.w-full.max-w-7xl {
+  position: relative;
+}
+
+/* Back arrow base improvements */
+.quotes-back-arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.quotes-back-arrow:hover {
+  background: rgba(0, 109, 141, 0.08);
+  transform: translateY(-1px);
+}
+
+/* Ensure arrow icon scales nicely */
+.quotes-back-arrow svg {
+  width: 22px;
+  height: 22px;
+}
+
+/* Breadcrumbs desktop spacing so arrow doesn't overlap */
+.crumbs {
+  flex-wrap: wrap;
+  line-height: 1.3;
+}
+
+/* If your arrow is absolute, give crumbs a little left breathing room on larger screens */
+@media (min-width: 577px) {
+  .crumbs.container {
+    padding-left: 44px;
+  }
+}
+
+/* Filters: allow pills to flex cleanly */
+.filters-container .d-flex.flex-wrap.gap-2 {
+  align-items: center;
+}
+
+/* Make pills flexible instead of forcing min-width too aggressively */
+.filter-pill {
+  min-width: 120px;
+}
+
+/* Subtle improvement to select tap area */
+.filter-select {
+  min-height: 32px;
+}
+
+/* Persona chip should not overflow */
+.persona-chip {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ------------------------------
+   TABLET BREAKPOINTS
+-------------------------------- */
+@media (max-width: 991.98px) {
+  /* Persona moves to next line naturally and aligns left */
+  .filters-container .col-xl-4,
+  .filters-container .col-lg-3 {
+    justify-content: flex-start !important;
+  }
+
+  .persona-chip {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* ------------------------------
+   MOBILE BREAKPOINTS
+-------------------------------- */
+@media (max-width: 576px) {
+  /* Back arrow becomes part of flow to avoid overlap */
+  .quotes-back-arrow {
+    position: static !important;
+    margin: 8px 0 0 6px;
+    background: #f4faff;
+    border: 1px solid #d7eaf9;
+  }
+
+  /* Remove the left padding added for desktop */
+  .crumbs.container {
+    padding-left: 0 !important;
+  }
+
+  .crumbs {
+    font-size: 0.9rem;
+    gap: 6px;
+    margin-top: 6px;
+    margin-bottom: 8px;
+  }
+
+  .crumbs span {
+    opacity: 0.6;
+  }
+
+  /* Filters container spacing */
+  .filters-container {
+    padding: 8px 0;
+  }
+
+  /* Force clean stacking + full width feel */
+  .filters-container .row {
+    row-gap: 10px;
+  }
+
+  /* Make pills wrap nicely in two rows if needed */
+  .filter-pill {
+    flex: 1 1 160px;
+    min-width: 0;
+  }
+
+  .filter-select {
+    font-size: 12px;
+    padding: 6px 2px;
+  }
+
+  /* Persona chip full width */
+  .persona-chip {
+    width: 100%;
+    font-size: 12px;
+    padding: 6px 12px;
+  }
+
+  /* Bottom line stays full width */
+  .bottom-line {
+    height: 0.35rem;
+  }
+}
+
+/* ------------------------------
+   VERY SMALL PHONES
+-------------------------------- */
+@media (max-width: 420px) {
+  .crumbs {
+    font-size: 0.85rem;
+  }
+
+  .filter-pill {
+    flex: 1 1 140px;
+  }
+
+  .filter-select {
+    font-size: 11.5px;
+  }
+
+  .persona-chip {
+    font-size: 11.5px;
+  }
+}
+.quotes-crumbs-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+@media (min-width: 577px) {
+  .quotes-crumbs-wrap .crumbs {
+    padding-left: 0; /* since arrow is inside flow now */
   }
 }

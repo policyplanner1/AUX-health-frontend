@@ -1,3 +1,11 @@
+<div class="quotes-crumbs-wrap container">
+<button class="quotes-back-arrow" (click)="goBack()" aria-label="Back">
+  <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5"
+      fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M15 6l-6 6 6 6" />
+  </svg>
+</button>
+
 <!-- Breadcrumbs -->
 <nav class="crumbs container">
   <a>Health Insurance</a>
@@ -6,6 +14,7 @@
   <span>›</span>
   <strong>List of Quotes</strong>
 </nav>
+</div>
 <hr class="m-0">
 
 <!-- Filter strip -->
@@ -15,12 +24,11 @@
     <div class="col-xl-8 col-lg-9 col-12">
       <div class="d-flex flex-wrap gap-2">
         <div class="filter-pill">
-          <select class="filter-select" [(ngModel)]="selectedCoverageAmt" (change)="onCoverageChange()"
-            name="coverageAmtFilter">
+          <select class="filter-select"
+                  [(ngModel)]="selectedCoverageAmt"
+                  (change)="onCoverageChange()"
+                  name="coverageAmtFilter">
             <option [ngValue]="null" disabled>Coverage Amt</option>
-            <!-- <option [ngValue]="200000">2 Lakh</option>
-            <option [ngValue]="300000">3 Lakh</option>
-            <option [ngValue]="400000">4 Lakh</option> -->
             <option [ngValue]="500000">5 Lakh</option>
             <option [ngValue]="700000">7 Lakh</option>
             <option [ngValue]="1000000">10 Lakh</option>
@@ -42,7 +50,10 @@
         </div>
 
         <div class="filter-pill filter-pill-icon">
-          <select class="filter-select" [(ngModel)]="selectedInsurer" (change)="onInsurerChange()" name="insurerFilter">
+          <select class="filter-select"
+                  [(ngModel)]="selectedInsurer"
+                  (change)="onInsurerChange()"
+                  name="insurerFilter">
             <option value="">Insurer</option>
             <option *ngFor="let insurer of insurerOptions" [value]="insurer">
               {{ insurer }}
@@ -50,18 +61,17 @@
           </select>
         </div>
 
+        <!-- ✅ Default will show Low to High because sortOption is preset in TS -->
         <div class="filter-pill">
-          <select class="filter-select" [(ngModel)]="sortOption" (change)="onSortChange()" name="sortBy">
+          <select class="filter-select"
+                  [(ngModel)]="sortOption"
+                  (change)="onSortChange()"
+                  name="sortBy">
             <option value="" disabled>Sort By</option>
             <option value="lowToHigh">Price: Low to High</option>
             <option value="highToLow">Price: High to Low</option>
           </select>
         </div>
-
-        <!-- <div class="filter-chip" (click)="openFilters()">
-          <img src="assets/quote/filter.svg" width="16">
-          <span>All Filters</span>
-        </div> -->
       </div>
     </div>
 
@@ -69,9 +79,6 @@
     <div class="col-xl-4 col-lg-3 col-12 d-flex justify-content-end justify-content-lg-end">
       <div class="persona-chip">
         Self: {{ age }} years <span class="divider">|</span> Pincode: {{ pincode }}
-        <!-- <button class="edit-btn">
-          <img src="assets/quote/edit.svg" width="12"> Edit
-        </button> -->
       </div>
     </div>
   </div>
@@ -79,30 +86,40 @@
 
 <div class="bottom-line"></div>
 
+<!-- ✅ NEW QUOTE COUNT LINE (like supertopup) -->
+<p class="quote-count container mt-3">
+  Here are
+  <span class="quote-count__number">{{ totalPlansCount }}</span>
+  plans made just for you, {{ userName }}
+  <img class="quote-count__gif" src="assets/heading-arrow.gif" alt="gif">
+</p>
+
 <div class="container" *ngIf="!isCompareOpen">
   <div class="row mt-3">
     <!-- LEFT (plans list, GROUPED BY INSURER) -->
     <div class="col-md-9">
       <div class="plans-scroll">
-        <!-- Loop through each company -->
         <ng-container *ngFor="let group of groupedResults; trackBy: trackByInsurer">
           <div class="insurer-group bg-white p-2 rounded-2xl shadow-md">
-            <!-- Plans for this company -->
             <div class="insurer-cards">
               <ng-container *ngFor="let plan of (group.showAll ? group.plans : group.plans | slice:0:1)">
                 <app-plan-card [isFirstCard]="true">
                   <!-- header right -->
-                  <div pc-header-right class="d-inline-flex align-items-center gap-2"> Add To Compare
-                    <input type="checkbox" [checked]="isSelected(plan)" (change)="onCompareToggle(plan, $event)" />
+                  <div pc-header-right class="d-inline-flex align-items-center gap-2">
+                    Add To Compare
+                    <input type="checkbox"
+                           [checked]="isSelected(plan)"
+                           (change)="onCompareToggle(plan, $event)" />
                   </div>
 
                   <!-- left content -->
                   <div pc-left>
                     <img [src]="'/assets/quote/' + group.plans[0].company.logo"
-                      [alt]="group.plans[0].company.company_name" style="width:80px;">
+                         [alt]="group.plans[0].company.company_name"
+                         style="width:80px;">
 
-                    <!-- margin tightened for compact card -->
                     <h5 style="margin:10px 4px 6px;">{{ plan.planName }}</h5>
+
                     <div class="benefit-badge" *ngIf="plan.features?.length">
                       <img src="assets/quote/circleOrange.svg" class="benefit-icon">
                       <span class="badge-text">{{ plan.features[0].includes }}</span>
@@ -123,21 +140,20 @@
                     </p>
                   </div>
 
-                 <!-- right content -->
+                  <!-- right content -->
                   <div pc-right>
                     <div class="pcs-facts"
-                      style="margin-bottom:10px; display:flex; flex-direction:column; align-items:center; text-align:center;">
+                         style="margin-bottom:10px; display:flex; flex-direction:column; align-items:center; text-align:center;">
                       <div class="pcs-fact">
                         <div class="label" style="font-size:0.9rem; color:#555;">Cover Amount</div>
                         <div class="value"
-                          style="font-weight:600; font-size:1.1rem; display:flex; align-items:center; justify-content:center; gap:4px;">
+                             style="font-weight:600; font-size:1.1rem; display:flex; align-items:center; justify-content:center; gap:4px;">
                           ₹ {{ plan.coverAmount | number:'1.0-0':'en-IN' }}
                           <i class="bi bi-chevron-down"></i>
                         </div>
                       </div>
                     </div>
 
-                    <!-- Buy Now Button (Dynamic, same as screenshot design) -->
                     <div class="pcs-buy-now">
                       <button class="cmp-buy mb-2" (click)="goToBuyNow(plan)">
                         Buy Now ₹{{ plan.totalPayablePremium | number:'1.0-0':'en-IN'}}/Year
@@ -159,63 +175,53 @@
       </div>
     </div>
 
-<!-- RIGHT (CTA) – SUPER TOPUP STYLE -->
-<div class="col-md-3">
+    <!-- RIGHT (CTA) – SUPER TOPUP STYLE -->
+    <div class="col-md-3">
+      <!-- CALL ME BOX -->
+      <div class="cta-st-box">
+        <div class="cta-st-avatar">
+          <img src="assets/quote/profile.svg" alt="Expert">
+        </div>
+        <h4 class="cta-st-title">Ready to get insured?</h4>
+        <p class="cta-st-desc">
+          Our experts will call you, explain the options, and help you buy the right policy
+        </p>
 
-  <!-- CALL ME BOX -->
-  <div class="cta-st-box">
+        <div class="cta-st-input-box">
+          <input type="text" value="+91 7798612243" class="cta-st-input">
+          <a href="tel:+91-7798612243">
+            <button class="cta-st-call-btn">Call Me</button>
+          </a>
+        </div>
+      </div>
 
-    <div class="cta-st-avatar">
-      <img src="assets/quote/profile.svg" alt="Expert">
+      <!-- INFO TILES -->
+      <div class="cta-st-icons-row mt-4">
+        <div class="cta-st-icon">
+          <img src="assets/quote/registration.svg">
+          <p>IRDAI Registered</p>
+        </div>
+        <div class="cta-st-icon">
+          <img src="assets/quote/claim.svg">
+          <p>Fast Claim process</p>
+        </div>
+        <div class="cta-st-icon">
+          <img src="assets/quote/call.svg">
+          <p>Expert Guidance</p>
+        </div>
+      </div>
+
+      <!-- CSR BOX -->
+      <div class="cta-st-csr-box">
+        <img src="assets/quote/heart.svg" class="csr-img">
+        <p class="csr-title">High CSR = higher peace of mind</p>
+        <p class="csr-desc">
+          A higher Claim Settlement Ratio (ideally 95%+) means more claims get paid.
+          Also check how fast claims are settled and consistency across the last few years.
+        </p>
+        <div class="csr-bottom-strip"></div>
+      </div>
     </div>
-
-    <h4 class="cta-st-title">Ready to get insured?</h4>
-
-    <p class="cta-st-desc">
-      Our experts will call you, explain the options, and help you buy the right policy
-    </p>
-
-    <div class="cta-st-input-box">
-      <input type="text" value="+91 7798612243" class="cta-st-input">
-      <a href="tel:+91-7798612243">
-        <button class="cta-st-call-btn">Call Me</button>
-      </a>
-    </div>
-
-  </div>
-
-  <!-- INFO TILES -->
-  <div class="cta-st-icons-row mt-4">
-    <div class="cta-st-icon">
-      <img src="assets/quote/registration.svg">
-      <p>IRDAI Registered</p>
-    </div>
-
-    <div class="cta-st-icon">
-      <img src="assets/quote/claim.svg">
-      <p>Fast Claim process</p>
-    </div>
-
-    <div class="cta-st-icon">
-      <img src="assets/quote/call.svg">
-      <p>Expert Guidance</p>
-    </div>
-  </div>
-
-  <!-- CSR BOX -->
-  <div class="cta-st-csr-box">
-    <img src="assets/quote/heart.svg" class="csr-img">
-    <p class="csr-title">High CSR = higher peace of mind</p>
-    <p class="csr-desc">
-      A higher Claim Settlement Ratio (ideally 95%+) means more claims get paid.
-      Also check how fast claims are settled and consistency across the last few years.
-    </p>
-    <div class="csr-bottom-strip"></div>
-  </div>
-
-</div>
-
-
   </div>
 </div>
 
@@ -328,7 +334,7 @@
             <div class="cmp-table-body">
               <div class="cmp-row"
                    *ngFor="let detail of getDetailsKeys()"
-                   [ngStyle]="{'grid-template-columns': getGridTemplateColumns()}">
+                  [ngStyle]="{'grid-template-columns': getGridTemplateColumns()}">
                 <div class="cmp-feature-col">
                   <span class="cmp-bullet"></span>
                   <span class="cmp-feature-name">{{ detail }}</span>
@@ -340,12 +346,8 @@
               </div>
             </div>
           </div>
-
-        </div> <!-- /cmp-table-wrapper -->
-      </div>   <!-- /cmp-pdf-area -->
-
-    </div> <!-- /cmp-pdf-root -->
-  </div>
+        </div>
+      </div>
 </div>
 
 <!-- Modal (Filters Popup) -->
