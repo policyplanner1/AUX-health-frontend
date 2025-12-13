@@ -19,7 +19,7 @@ interface Plan {
   monthlyPrice: string;
   yearlyPrice: string;
   coverBand?: string;
-   features?: { includes: string }[];
+  features?: { includes: string }[];
 }
 
 // ✅ Define the payload type OUTSIDE the class
@@ -45,7 +45,7 @@ type PlanPayload = {
 })
 export class QuotePageComponent implements OnInit {
   trackByPlan = (_: number, plan: any) =>
-  plan?.planId ?? plan?.id ?? plan?.planName ?? _;
+    plan?.planId ?? plan?.id ?? plan?.planName ?? _;
 
   // groupedResults: any[] = [];
   // expandedInsurers: Set<string> = new Set();
@@ -75,12 +75,12 @@ export class QuotePageComponent implements OnInit {
 
 
   // ✅ Total plans count for heading
- get totalPlansCount(): number {
-  return this.displayedResults?.length || 0;
-}
+  get totalPlansCount(): number {
+    return this.displayedResults?.length || 0;
+  }
 
 
-ngOnInit(): void {
+  ngOnInit(): void {
 
     // ✅ Ensure default sort on first entry to quotes page
     this.sortOption = 'lowToHigh';
@@ -150,25 +150,6 @@ ngOnInit(): void {
     }
   }
 
-  // ---- helpers ----
-//   private groupPlansByCompanyPreserveOrder(plans: any[]) {
-//   const map = new Map<string, any[]>();
-
-//   for (const plan of plans) {
-//     const key = String(plan.companyId ?? plan.company?.company_id ?? plan.company?.id ?? 'unknown');
-
-//     if (!map.has(key)) {
-//       map.set(key, []);
-//     }
-//     map.get(key)!.push(plan);
-//   }
-
-//   return Array.from(map.entries()).map(([companyId, groupedPlans]) => ({
-//     companyId,
-//     plans: groupedPlans,
-//     showAll: true
-//   }));
-// }
 
   private toNum(v: any, d = 0): number {
     const n = Number(v);
@@ -211,68 +192,64 @@ ngOnInit(): void {
   }
 
 
-private parsePremium(raw: any): number {
-  if (raw === null || raw === undefined) return Number.POSITIVE_INFINITY;
+  private parsePremium(raw: any): number {
+    if (raw === null || raw === undefined) return Number.POSITIVE_INFINITY;
 
-  if (typeof raw === 'number') {
-    return Number.isFinite(raw) ? raw : Number.POSITIVE_INFINITY;
+    if (typeof raw === 'number') {
+      return Number.isFinite(raw) ? raw : Number.POSITIVE_INFINITY;
+    }
+
+    // remove ₹, commas, spaces, /year etc.
+    const cleaned = String(raw).replace(/[^0-9.]/g, '');
+    const num = Number(cleaned);
+
+    return Number.isFinite(num) ? num : Number.POSITIVE_INFINITY;
   }
 
-  // remove ₹, commas, spaces, /year etc.
-  const cleaned = String(raw).replace(/[^0-9.]/g, '');
-  const num = Number(cleaned);
+  private getPlanPremium(p: any): number {
+    // fallback keys for safety
+    const raw =
+      p?.totalPayablePremium ??
+      p?.yearlyPremium ??
+      p?.annualPremium ??
+      p?.premium ??
+      p?.total_premium ??
+      p?.totalPremium ??
+      null;
 
-  return Number.isFinite(num) ? num : Number.POSITIVE_INFINITY;
-}
-
-private getPlanPremium(p: any): number {
-  // fallback keys for safety
-  const raw =
-    p?.totalPayablePremium ??
-    p?.yearlyPremium ??
-    p?.annualPremium ??
-    p?.premium ??
-    p?.total_premium ??
-    p?.totalPremium ??
-    null;
-
-  return this.parsePremium(raw);
-}
-
-private applyListView(): void {
-  let list = [...(this.results || [])];
-
-  // ✅ insurer filter (GLOBAL)
-  if (this.selectedInsurer) {
-    list = list.filter(
-      (p: any) => p?.company?.company_name === this.selectedInsurer
-    );
+    return this.parsePremium(raw);
   }
 
-  // ✅ default sort safety
-  if (!this.sortOption) {
-    this.sortOption = 'lowToHigh';
+  private applyListView(): void {
+    let list = [...(this.results || [])];
+
+    // ✅ insurer filter (GLOBAL)
+    if (this.selectedInsurer) {
+      list = list.filter(
+        (p: any) => p?.company?.company_name === this.selectedInsurer
+      );
+    }
+
+    // ✅ default sort safety
+    if (!this.sortOption) {
+      this.sortOption = 'lowToHigh';
+    }
+
+    // ✅ GLOBAL sort (overall list)
+    list.sort((a: any, b: any) => {
+      const pa = this.getPlanPremium(a);
+      const pb = this.getPlanPremium(b);
+
+      if (this.sortOption === 'lowToHigh') return pa - pb;
+      if (this.sortOption === 'highToLow') return pb - pa;
+      return 0;
+    });
+
+    this.displayedResults = list;
   }
 
-  // ✅ GLOBAL sort (overall list)
-  list.sort((a: any, b: any) => {
-    const pa = this.getPlanPremium(a);
-    const pb = this.getPlanPremium(b);
 
-    if (this.sortOption === 'lowToHigh') return pa - pb;
-    if (this.sortOption === 'highToLow') return pb - pa;
-    return 0;
-  });
-
-  this.displayedResults = list;
-}
-
-// private getMinPremium(group: any): number {
-//   if (!group?.plans?.length) return Number.POSITIVE_INFINITY;
-//   return Math.min(...group.plans.map((p: any) => this.getPlanPremium(p)));
-// }
-
-goBack(): void {
+  goBack(): void {
     // Try real browser back first
     if (window.history.length > 1) {
       this.location.back();
@@ -288,18 +265,18 @@ goBack(): void {
         const apiList = response?.data?.map((item: any) => item.api_type) || [];
 
         this.api.callAllPremiumApis(apiList, payload).subscribe({
-        next: (resArray) => {
-  this.results = resArray.filter((res: any) => res && res.planName);
-  console.log('Aggregated Results:', this.results);
+          next: (resArray) => {
+            this.results = resArray.filter((res: any) => res && res.planName);
+            console.log('Aggregated Results:', this.results);
 
-  // ✅ insurer dropdown build from full results
-  this.buildInsurerOptions();
+            // ✅ insurer dropdown build from full results
+            this.buildInsurerOptions();
 
-  // ✅ apply GLOBAL filter + GLOBAL sort
-  this.applyListView();
+            // ✅ apply GLOBAL filter + GLOBAL sort
+            this.applyListView();
 
-  this.isLoading = false;
-},
+            this.isLoading = false;
+          },
 
           error: (err) => {
             console.error('Error calling premium APIs:', err);
@@ -313,48 +290,39 @@ goBack(): void {
       }
     });
   }
-formatCoverAmount(value: any): string {
-  const num = Number(value);
-  if (!num) return value;
+  formatCoverAmount(value: any): string {
+    const num = Number(value);
+    if (!num) return value;
 
-  if (num >= 100000 && num < 10000000) {
-    const lakhs = num / 100000;
-    return lakhs % 1 === 0 ? `${lakhs} Lakh` : `${lakhs.toFixed(1)} Lakh`;
+    if (num >= 100000 && num < 10000000) {
+      const lakhs = num / 100000;
+      return lakhs % 1 === 0 ? `${lakhs} Lakh` : `${lakhs.toFixed(1)} Lakh`;
+    }
+
+    if (num >= 10000000) {
+      const crores = num / 10000000;
+      return crores % 1 === 0 ? `${crores} Crore` : `${crores.toFixed(1)} Crore`;
+    }
+
+    return num.toString();
+  }
+  // 🔢 Dynamic grid columns for comparison table/header
+  getGridTemplateColumns(): string {
+    const planCount = this.compare?.length || 0;
+
+    // Always keep first column for "COMPARISON SUMMARY"
+    // and distribute remaining width evenly among selected plans
+    // const planCols = count > 0 ? count : 1;
+
+    // 300px for left feature column, remaining columns flexible
+    return `300px repeat(${planCount || 1}, 1fr)`;
   }
 
-  if (num >= 10000000) {
-    const crores = num / 10000000;
-    return crores % 1 === 0 ? `${crores} Crore` : `${crores.toFixed(1)} Crore`;
+
+  onSortChange(): void {
+    this.applyListView();
   }
 
-  return num.toString();
-}
-// 🔢 Dynamic grid columns for comparison table/header
-getGridTemplateColumns(): string {
-  const planCount = this.compare?.length || 0;
-
-  // Always keep first column for "COMPARISON SUMMARY"
-  // and distribute remaining width evenly among selected plans
-  // const planCols = count > 0 ? count : 1;
-
-  // 300px for left feature column, remaining columns flexible
-  return `300px repeat(${planCount || 1}, 1fr)`;
-}
-
-
- onSortChange(): void {
-  this.applyListView();
-}
-
-
-
-
-  // private getMinPremium(group: any): number {
-  //   if (!group || !group.plans || !group.plans.length) return Number.POSITIVE_INFINITY;
-  //   return Math.min(
-  //     ...group.plans.map((p: any) => Number(p.totalPayablePremium) || 0)
-  //   );
-  // }
 
   onCoverageChange(): void {
     if (!this.basePayload) return;
@@ -372,51 +340,29 @@ getGridTemplateColumns(): string {
   }
 
   // Build unique insurer list
- buildInsurerOptions(): void {
-  const set = new Set<string>();
+  buildInsurerOptions(): void {
+    const set = new Set<string>();
 
-  (this.results || []).forEach((p: any) => {
-    const name = p?.company?.company_name;
-    if (name) set.add(name);
-  });
+    (this.results || []).forEach((p: any) => {
+      const name = p?.company?.company_name;
+      if (name) set.add(name);
+    });
 
-  this.insurerOptions = Array.from(set).sort();
-}
+    this.insurerOptions = Array.from(set).sort();
+  }
 
- onInsurerChange(): void {
-  this.applyListView();
-}
+  onInsurerChange(): void {
+    this.applyListView();
+  }
 
-
-
-
-
-  // groupPlansByCompany(plans: any[]) {
-  //   const grouped: any = {};
-  //   plans.forEach(plan => {
-  //     if (!grouped[plan.companyId]) grouped[plan.companyId] = [];
-  //     grouped[plan.companyId].push(plan);
-  //   });
-
-  //   // Convert to array format for easier *ngFor
-  //   return Object.keys(grouped).map(companyId => ({
-  //     companyId,
-  //     plans: grouped[companyId],
-  //     showAll: true
-  //   }));
-  // }
-
-  // toggleCompanyPlans(group: any) {
-  //   group.showAll = !group.showAll;
-  // }
 
   // Inside your component.ts file
   getVisibleFeatures(plan: any) {
     if (!plan?.features) return [];
 
     if (plan.showAll === undefined) {
-    plan.showAll = false; // ✅ default
-  }
+      plan.showAll = false; // ✅ default
+    }
     // Filter out null, undefined, or empty includes
     const validFeatures = plan.features.filter(
       (t: any) => t && t.includes && t.includes.trim() !== ''
@@ -426,27 +372,18 @@ getGridTemplateColumns(): string {
     return plan.showAll ? validFeatures : validFeatures.slice(0, 2);
   }
 
-
   toggleShowMore(plan: any) {
     plan.showAll = !plan.showAll;
   }
-goToAllFeatures(plan: any) {
+  goToAllFeatures(plan: any) {
 
-      this.router.navigate(['all-features'], { state: { selectedPlan: plan } });
+    this.router.navigate(['all-features'], { state: { selectedPlan: plan } });
 
-}
+  }
 
 
   /* ===================== UI / TEMPLATE STATE ===================== */
 
-  // Router helper
-  goTo_allFeatures(event?: MouseEvent): void {
-    event?.preventDefault();
-    this.router.navigate(['/all-features']);
-  }
-
-  // TrackBys expected by template
-// trackByInsurer = (_: number, g: any) => g.companyId;
 
   // Slides expected by template
   infoSlides = [
@@ -646,118 +583,118 @@ goToAllFeatures(plan: any) {
   /* -------------------------------------------------------
       🚀 PDF DOWNLOAD FUNCTION
   --------------------------------------------------------*/
-downloadPDF() {
-  const DATA = document.getElementById('compareWrapper');
-  if (!DATA) {
-    console.warn('compareWrapper not found in DOM');
-    return;
-  }
+  downloadPDF() {
+    const DATA = document.getElementById('compareWrapper');
+    if (!DATA) {
+      console.warn('compareWrapper not found in DOM');
+      return;
+    }
 
-  // Main scrolling area that actually holds the wide table
-  const tableWrapper = DATA.querySelector('.cmp-table-wrapper') as HTMLElement | null;
+    // Main scrolling area that actually holds the wide table
+    const tableWrapper = DATA.querySelector('.cmp-table-wrapper') as HTMLElement | null;
 
-  // Full content size (including horizontally scrollable part)
-  const contentWidth = tableWrapper
-    ? tableWrapper.scrollWidth
-    : DATA.scrollWidth;
+    // Full content size (including horizontally scrollable part)
+    const contentWidth = tableWrapper
+      ? tableWrapper.scrollWidth
+      : DATA.scrollWidth;
 
-  const contentHeight = tableWrapper
-    ? tableWrapper.scrollHeight + tableWrapper.offsetTop
-    : DATA.scrollHeight;
+    const contentHeight = tableWrapper
+      ? tableWrapper.scrollHeight + tableWrapper.offsetTop
+      : DATA.scrollHeight;
 
-  // Do we need to expand? (mobile / narrow screens)
-  const needsExpand =
-    contentWidth > DATA.clientWidth || contentHeight > DATA.clientHeight;
+    // Do we need to expand? (mobile / narrow screens)
+    const needsExpand =
+      contentWidth > DATA.clientWidth || contentHeight > DATA.clientHeight;
 
-  // ✅ Remember old inline styles so we can restore later
-  const prevHeight = DATA.style.height;
-  const prevOverflow = DATA.style.overflow;
-  const prevPosition = DATA.style.position;
-  const prevWidth = DATA.style.width;
+    // ✅ Remember old inline styles so we can restore later
+    const prevHeight = DATA.style.height;
+    const prevOverflow = DATA.style.overflow;
+    const prevPosition = DATA.style.position;
+    const prevWidth = DATA.style.width;
 
-  let prevTwOverflowX = '';
-  let prevTwOverflowY = '';
-  let prevTwWidth = '';
-
-  if (tableWrapper) {
-    prevTwOverflowX = tableWrapper.style.overflowX;
-    prevTwOverflowY = tableWrapper.style.overflowY;
-    prevTwWidth = tableWrapper.style.width;
-  }
-
-  if (needsExpand) {
-    // Only do this on mobile / narrow or when content is bigger than viewport
-    DATA.classList.add('export-pdf');
-
-    // Let the wrapper grow to its full scroll size and remove scrollbars
-    DATA.style.height = contentHeight + 'px';
-    DATA.style.overflow = 'visible';
-    DATA.style.position = 'static';
-    DATA.style.width = contentWidth + 'px';
+    let prevTwOverflowX = '';
+    let prevTwOverflowY = '';
+    let prevTwWidth = '';
 
     if (tableWrapper) {
-      tableWrapper.style.overflowX = 'visible';
-      tableWrapper.style.overflowY = 'visible';
-      tableWrapper.style.width = contentWidth + 'px';
+      prevTwOverflowX = tableWrapper.style.overflowX;
+      prevTwOverflowY = tableWrapper.style.overflowY;
+      prevTwWidth = tableWrapper.style.width;
     }
-  }
 
-  html2canvas(DATA, {
-    scale: 3,
-    useCORS: true,
-    allowTaint: true,
-    scrollX: 0,
-    scrollY: 0,
-    // Only force width/height when we expanded for mobile
-    width: needsExpand ? contentWidth : undefined,
-    height: needsExpand ? contentHeight : undefined,
-    windowWidth: needsExpand ? contentWidth : undefined,
-    windowHeight: needsExpand ? contentHeight : undefined,
-  })
-    .then((canvas: HTMLCanvasElement) => {
-      const imgData = canvas.toDataURL('image/png', 1.0);
+    if (needsExpand) {
+      // Only do this on mobile / narrow or when content is bigger than viewport
+      DATA.classList.add('export-pdf');
 
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      const pageWidth = pdf.internal.pageSize.getWidth();
-      const pageHeight = pdf.internal.pageSize.getHeight();
-
-      const imgWidth = pageWidth;
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-      let heightLeft = imgHeight;
-      let position = 0;
-
-      // First page
-      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
-
-      // Extra pages
-      while (heightLeft > 0) {
-        position = heightLeft - imgHeight;
-        pdf.addPage();
-        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
-      }
-
-      pdf.save('comparison.pdf');
-    })
-    .catch(err => {
-      console.error('html2canvas error:', err);
-    })
-    .finally(() => {
-      // ✅ Restore original DOM state (so desktop behaviour stays unchanged)
-      DATA.classList.remove('export-pdf');
-      DATA.style.height = prevHeight;
-      DATA.style.overflow = prevOverflow;
-      DATA.style.position = prevPosition;
-      DATA.style.width = prevWidth;
+      // Let the wrapper grow to its full scroll size and remove scrollbars
+      DATA.style.height = contentHeight + 'px';
+      DATA.style.overflow = 'visible';
+      DATA.style.position = 'static';
+      DATA.style.width = contentWidth + 'px';
 
       if (tableWrapper) {
-        tableWrapper.style.overflowX = prevTwOverflowX;
-        tableWrapper.style.overflowY = prevTwOverflowY;
-        tableWrapper.style.width = prevTwWidth;
+        tableWrapper.style.overflowX = 'visible';
+        tableWrapper.style.overflowY = 'visible';
+        tableWrapper.style.width = contentWidth + 'px';
       }
-    });
+    }
+
+    html2canvas(DATA, {
+      scale: 3,
+      useCORS: true,
+      allowTaint: true,
+      scrollX: 0,
+      scrollY: 0,
+      // Only force width/height when we expanded for mobile
+      width: needsExpand ? contentWidth : undefined,
+      height: needsExpand ? contentHeight : undefined,
+      windowWidth: needsExpand ? contentWidth : undefined,
+      windowHeight: needsExpand ? contentHeight : undefined,
+    })
+      .then((canvas: HTMLCanvasElement) => {
+        const imgData = canvas.toDataURL('image/png', 1.0);
+
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const pageWidth = pdf.internal.pageSize.getWidth();
+        const pageHeight = pdf.internal.pageSize.getHeight();
+
+        const imgWidth = pageWidth;
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+        let heightLeft = imgHeight;
+        let position = 0;
+
+        // First page
+        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+
+        // Extra pages
+        while (heightLeft > 0) {
+          position = heightLeft - imgHeight;
+          pdf.addPage();
+          pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+          heightLeft -= pageHeight;
+        }
+
+        pdf.save('comparison.pdf');
+      })
+      .catch(err => {
+        console.error('html2canvas error:', err);
+      })
+      .finally(() => {
+        // ✅ Restore original DOM state (so desktop behaviour stays unchanged)
+        DATA.classList.remove('export-pdf');
+        DATA.style.height = prevHeight;
+        DATA.style.overflow = prevOverflow;
+        DATA.style.position = prevPosition;
+        DATA.style.width = prevWidth;
+
+        if (tableWrapper) {
+          tableWrapper.style.overflowX = prevTwOverflowX;
+          tableWrapper.style.overflowY = prevTwOverflowY;
+          tableWrapper.style.width = prevTwWidth;
+        }
+      });
   }
 }
 

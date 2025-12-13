@@ -449,8 +449,8 @@
 .pcs-link {
   color: #006D8D;
   text-decoration: none;
-  font-size: 13px;
-  font-weight: 500;
+  font-size: 14px !important;
+  font-weight: 400 !important;
 }
 
 .pcs-link:hover {
@@ -951,7 +951,7 @@
   display: flex;
   align-items: center;
   gap: 4px;
-  background: #FFE0B2;
+  background: #fff0dc;
   padding: 3px 10px;
   border-radius: 15px;
 }
@@ -1591,16 +1591,7 @@
   }
 
 }
-.quotes-back-arrow {
-  position: absolute;
-  top: 14px;
-  left: 10px;
-  background: transparent;
-  border: none;
-  padding: 0;
-  cursor: pointer;
-  z-index: 2000;
-}
+
 
 .quote-count {
   font-size: 14px;
@@ -1728,6 +1719,8 @@
 
 /* Back arrow base improvements */
 .quotes-back-arrow {
+  background: transparent;
+  border: none;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1885,7 +1878,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  flex-wrap: wrap;
+  /* flex-wrap: wrap; */
 }
 
 @media (min-width: 577px) {
@@ -1903,6 +1896,8 @@
 .quotes-plans-layout {
   height: auto !important;
   overflow: visible !important;
+  max-width: 1240px;
+
 }
 
 @media (min-width: 992px) {
