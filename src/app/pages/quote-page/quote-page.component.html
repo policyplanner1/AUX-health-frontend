@@ -2,11 +2,11 @@
 <ng-container *ngIf="!isCompareOpen">
 <div class="quotes-crumbs-wrap container">
 <button class="quotes-back-arrow" (click)="goBack()" aria-label="Back">
-    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5"
-         fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-      <path stroke-linecap="round" stroke-linejoin="round" d="M15 6l-6 6 6 6" />
-    </svg>
-  </button>
+  <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5"
+      fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M15 6l-6 6 6 6" />
+  </svg>
+</button>
 
   <!-- Breadcrumbs -->
   <nav class="crumbs container">
@@ -28,10 +28,8 @@
       <div class="d-flex flex-wrap gap-2">
 
         <div class="filter-pill">
-          <select class="filter-select"
-                  [(ngModel)]="selectedCoverageAmt"
-                  (change)="onCoverageChange()"
-                  name="coverageAmtFilter">
+          <select class="filter-select" [(ngModel)]="selectedCoverageAmt" (change)="onCoverageChange()"
+            name="coverageAmtFilter">
             <option [ngValue]="null" disabled>Coverage Amt</option>
             <option [ngValue]="500000">5 Lakh</option>
             <option [ngValue]="700000">7 Lakh</option>
@@ -54,10 +52,7 @@
         </div>
 
         <div class="filter-pill filter-pill-icon">
-          <select class="filter-select"
-                  [(ngModel)]="selectedInsurer"
-                  (change)="onInsurerChange()"
-                  name="insurerFilter">
+          <select class="filter-select" [(ngModel)]="selectedInsurer" (change)="onInsurerChange()" name="insurerFilter">
             <option value="">Insurer</option>
             <option *ngFor="let insurer of insurerOptions" [value]="insurer">
               {{ insurer }}
@@ -66,10 +61,7 @@
         </div>
 
         <div class="filter-pill">
-          <select class="filter-select"
-                  [(ngModel)]="sortOption"
-                  (change)="onSortChange()"
-                  name="sortBy">
+          <select class="filter-select" [(ngModel)]="sortOption" (change)="onSortChange()" name="sortBy">
             <option value="" disabled>Sort By</option>
             <option value="lowToHigh">Price: Low to High</option>
             <option value="highToLow">Price: High to Low</option>
@@ -105,25 +97,24 @@
     <!-- LEFT (plans list) -->
     <div class="col-md-9">
       <div class="plans-scroll">
+       <ng-container *ngFor="let plan of displayedResults; trackBy: trackByPlan">
+  <app-plan-card [isFirstCard]="true">
 
-        <ng-container *ngFor="let plan of displayedResults; trackBy: trackByPlan">
-          <app-plan-card [isFirstCard]="true">
+    <!-- header right -->
+    <div pc-header-right class="d-inline-flex align-items-center gap-2">
+      Add To Compare
+      <input type="checkbox"
+             [checked]="isSelected(plan)"
+             (change)="onCompareToggle(plan, $event)" />
+    </div>
 
-            <!-- header right -->
-            <div pc-header-right class="d-inline-flex align-items-center gap-2">
-              Add To Compare
-              <input type="checkbox"
-                     [checked]="isSelected(plan)"
-                     (change)="onCompareToggle(plan, $event)" />
-            </div>
-
-            <!-- left content -->
-            <div pc-left>
-              <img
-                [src]="'/assets/quote/' + plan?.company?.logo"
-                [alt]="plan?.company?.company_name"
-                style="width:80px;"
-              >
+    <!-- left content -->
+    <div pc-left>
+      <img
+        [src]="'/assets/quote/' + plan?.company?.logo"
+        [alt]="plan?.company?.company_name"
+        style="width:80px;"
+      >
 
               <h5 style="margin:10px 4px 6px;">{{ plan.planName }}</h5>
 
@@ -133,33 +124,33 @@
               </div>
             </div>
 
-            <!-- middle content -->
-            <div pc-mid *ngIf="plan.features?.length > 0">
-              <ul class="pcs-ticks">
-                <li *ngFor="let t of plan.features?.slice(0,3)">
-                  <img src="assets/quote/right.svg" alt="" />
-                  {{ t?.includes }}
-                </li>
-              </ul>
+    <!-- middle content -->
+    <div pc-mid *ngIf="plan.features?.length > 0">
+      <ul class="pcs-ticks">
+        <li *ngFor="let t of plan.features?.slice(0,3)">
+          <img src="assets/quote/right.svg" alt="" />
+          {{ t?.includes }}
+        </li>
+      </ul>
 
               <p class="viewmore" (click)="goToAllFeatures(plan)">
                 All features
               </p>
             </div>
 
-            <!-- right content -->
-            <div pc-right>
-              <div class="pcs-facts"
-                   style="margin-bottom:10px; display:flex; flex-direction:column; align-items:center; text-align:center;">
-                <div class="pcs-fact">
-                  <div class="label" style="font-size:0.9rem; color:#555;">Cover Amount</div>
-                  <div class="value"
-                       style="font-weight:600; font-size:1.1rem; display:flex; align-items:center; justify-content:center; gap:4px;">
-                    ₹ {{ formatCoverAmount(plan.coverAmount) }}
-                    <i class="bi bi-chevron-down"></i>
-                  </div>
-                </div>
-              </div>
+    <!-- right content -->
+    <div pc-right>
+      <div class="pcs-facts"
+           style="margin-bottom:10px; display:flex; flex-direction:column; align-items:center; text-align:center;">
+        <div class="pcs-fact">
+          <div class="label" style="font-size:0.9rem; color:#555;">Cover Amount</div>
+          <div class="value"
+               style="font-weight:600; font-size:1.1rem; display:flex; align-items:center; justify-content:center; gap:4px;">
+            ₹ {{ formatCoverAmount(plan.coverAmount) }}
+            <i class="bi bi-chevron-down"></i>
+          </div>
+        </div>
+      </div>
 
               <div class="pcs-buy-now">
                 <button class="cmp-buy mb-2" (click)="goToBuyNow(plan)">
@@ -181,8 +172,9 @@
       </div>
     </div>
 
-    <!-- RIGHT (CTA) -->
-    <div class="col-md-3 right-cta-sticky">
+   <!-- RIGHT (CTA) – SUPER TOPUP STYLE -->
+<div class="col-md-3 right-cta-sticky">
+  <!-- <div class="right-cta-sticky"> -->
 
       <!-- CALL ME BOX -->
       <div class="cta-st-box">
@@ -234,11 +226,10 @@
   </div>
 </div>
 
-<!-- ✅ FIXED BOTTOM COMPARE BAR -->
+<!-- === FIXED BOTTOM COMPARE BAR - RESPONSIVE === -->
 <div class="compare-bar" *ngIf="compare.length > 0 && !isCompareOpen">
   <div class="compare-inner">
     <div class="chips">
-
       <!-- Selected plans -->
       <div class="chip" *ngFor="let p of compare; trackBy: trackByPlanId">
         <img [src]="p.logo" [alt]="p.insurerName" />
@@ -249,45 +240,44 @@
         <button class="chip-x" (click)="removeFromCompare(p)">✕</button>
       </div>
 
-      <!-- Empty slots -->
-      <div class="chip empty" *ngFor="let n of emptySlots">
-        <span>Add Plan</span>
+          <!-- Empty slots -->
+          <div class="chip empty" *ngFor="let n of emptySlots">
+            <span>Add Plan</span>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="btn clear" (click)="clearCompare()">Clear</button>
+          <button class="btn primary" [disabled]="compare.length < 2" (click)="compareNow()">
+            Compare ({{ compare.length }})
+          </button>
+        </div>
       </div>
     </div>
 
-    <div class="actions">
-      <button class="btn clear" (click)="clearCompare()">Clear</button>
-      <button class="btn primary" [disabled]="compare.length < 2" (click)="compareNow()">
-        Compare ({{ compare.length }})
-      </button>
-    </div>
-  </div>
-</div>
-
-</ng-container>
-<!-- ✅ FULL-SCREEN COMPARISON PAGE -->
-<ng-container *ngIf="isCompareOpen">
+<!-- === FULL-SCREEN COMPARISON PAGE === -->
+<div *ngIf="isCompareOpen">
   <div id="compareWrapper" class="cmp-screen">
 
-    <!-- HEADER -->
+    <!-- HEADER: back + title + download -->
     <div class="cmp-screen__header">
       <button class="cmp-back" (click)="closeCompare()" aria-label="Back">
         ← Back to list
       </button>
 
-      <div class="cmp-screen__title">Compare Plans</div>
+          <div class="cmp-screen__title">Compare Plans</div>
 
-      <div class="cmp-screen__header-right">
-        <button class="cmp-download-btn" (click)="downloadPDF()">
-          <i class="bi bi-download"></i> Download PDF
-        </button>
-      </div>
-    </div>
+          <div class="cmp-screen__header-right">
+            <button class="cmp-download-btn" (click)="downloadPDF()">
+              <i class="bi bi-download"></i> Download PDF
+            </button>
+          </div>
+        </div>
 
-    <!-- PDF ROOT -->
+    <!-- EVERYTHING that should come in PDF -->
     <div class="cmp-pdf-root">
 
-      <!-- NAME + FAMILY STRIP -->
+      <!-- NAME + FAMILY STRIP (now INSIDE the PDF root) -->
       <div class="cmp-user-strip" *ngIf="userName || familyCount">
         <div class="cmp-user-pill">
           <span class="cmp-user-name" *ngIf="userName">{{ userName }}</span>
@@ -295,20 +285,18 @@
           <span class="cmp-family" *ngIf="familyCount">
             Family: {{ familyCount }}
             <span *ngIf="adultCount || childCount">
-              ( Adults {{ adultCount || 0 }}, Children {{ childCount || 0 }} )
+              ( Adults {{ adultCount || 0 }}, Children {{ childCount || 0 }})
             </span>
           </span>
         </div>
       </div>
 
-      <!-- Main white area -->
+      <!-- Main white area (header + table) -->
       <div class="cmp-pdf-area">
         <div class="cmp-table-wrapper">
-
-          <!-- Top header row -->
+          <!-- Header with plan cards -->
           <div class="cmp-top" [ngStyle]="{'grid-template-columns': getGridTemplateColumns()}">
-
-            <!-- Features Column -->
+            <!-- Features Column with Heart Icon -->
             <div class="cmp-features-col">
               <div class="cmp-heart-feature">
                 <img src="assets/quote/heartIns.png" alt="Features" class="cmp-heart-icon" />
@@ -316,28 +304,29 @@
               </div>
             </div>
 
-            <!-- Plan Columns -->
-            <div class="cmp-plan-col" *ngFor="let p of compare; trackBy: trackByPlanId">
-              <button class="cmp-remove-round" (click)="removeFromCompare2(p)">✕</button>
+                <!-- Plan Columns -->
+                <div class="cmp-plan-col" *ngFor="let p of compare; trackBy: trackByPlanId">
+                  <button class="cmp-remove-round" (click)="removeFromCompare2(p)">✕</button>
 
-              <div class="cmp-logo-name-row">
-                <div class="cmp-logo-wrapper">
-                  <img [src]="p.logo" [alt]="p.insurerName" class="cmp-company-logo" />
-                </div>
-                <div class="cmp-name-wrapper">
-                  <div class="cmp-company-name">{{ p.productName }}</div>
-                </div>
-              </div>
+                  <div class="cmp-logo-name-row">
+                    <div class="cmp-logo-wrapper">
+                      <img [src]="p.logo" [alt]="p.insurerName" class="cmp-company-logo" />
+                    </div>
+                    <div class="cmp-name-wrapper">
+                      <div class="cmp-company-name">{{ p.productName }}</div>
+                    </div>
+                  </div>
 
               <div class="cmp-cover-section">
                 <div class="cmp-cover-label">Cover Amount</div>
                 <div class="cmp-cover-value">
-                  ₹ {{ formatCoverAmount(p.coverAmount) }}
+₹ {{ formatCoverAmount(p.coverAmount) }}
                 </div>
               </div>
 
               <button class="cmp-buy-now-btn" (click)="goToBuyNow(p)">
                 Buy now for ₹{{ formatCoverAmount(p.monthlyPrice) }}
+
               </button>
             </div>
           </div>
@@ -347,8 +336,7 @@
             <div class="cmp-table-body">
               <div class="cmp-row"
                    *ngFor="let detail of getDetailsKeys()"
-                   [ngStyle]="{'grid-template-columns': getGridTemplateColumns()}">
-
+                  [ngStyle]="{'grid-template-columns': getGridTemplateColumns()}">
                 <div class="cmp-feature-col">
                   <span class="cmp-bullet"></span>
                   <span class="cmp-feature-name">{{ detail }}</span>
@@ -357,22 +345,16 @@
                 <div class="cmp-data-col" *ngFor="let p of compare">
                   {{ p.otherDetails?.[detail] || '—' }}
                 </div>
-
               </div>
             </div>
           </div>
-
         </div>
       </div>
+</div>
 
-    </div>
-  </div>
-
-</ng-container>
 <!-- Modal (Filters Popup) -->
 <div class="inline-backdrop" *ngIf="isFiltersOpen" (click)="closeFilters()">
   <div class="inline-modal" (click)="$event.stopPropagation()">
-
     <!-- Header -->
     <div class="inline-header">
       <div class="inline-title">Filter Plans</div>
@@ -381,84 +363,79 @@
 
     <!-- Body -->
     <div class="inline-body">
-
       <!-- Left tabs -->
       <aside class="inline-tabs">
-        <button class="tab"
-                *ngFor="let t of tabs"
-                (click)="setTab(t.id)"
-                [class.active]="activeTab === t.id">
+        <button class="tab" *ngFor="let t of tabs" (click)="setTab(t.id)" [class.active]="activeTab === t.id">
           {{ t.label }}
         </button>
       </aside>
 
       <!-- Right panel -->
       <section class="inline-panel" [ngSwitch]="activeTab">
-
         <!-- SORT BY -->
         <ng-container *ngSwitchCase="'sort'">
           <h5 class="panel-title">Sort by</h5>
           <p class="panel-sub">Plans with your preference will be shown first</p>
 
-          <div class="pill-row">
-            <label class="coverpill" [class.active]="sortBy==='relevance'">
-              <input type="radio" name="sortBy" value="relevance" [(ngModel)]="sortBy">
-              <span>By relevance</span>
-            </label>
+                  <div class="pill-row">
+                    <label class="coverpill" [class.active]="sortBy==='relevance'">
+                      <input type="radio" name="sortBy" value="relevance" [(ngModel)]="sortBy">
+                      <span>By relevance</span>
+                    </label>
 
-            <label class="coverpill" [class.active]="sortBy==='priceAsc'">
-              <input type="radio" name="sortBy" value="priceAsc" [(ngModel)]="sortBy">
-              <span>Premium low to high</span>
-            </label>
-          </div>
+                    <label class="coverpill" [class.active]="sortBy==='priceAsc'">
+                      <input type="radio" name="sortBy" value="priceAsc" [(ngModel)]="sortBy">
+                      <span>Premium low to high</span>
+                    </label>
+                  </div>
 
-          <div class="pill-row mt-2">
-            <label class="coverpill" [class.active]="sortBy==='cashless'">
-              <input type="radio" name="sortBy" value="cashless" [(ngModel)]="sortBy">
-              <span>Cashless hospitals network</span>
-            </label>
-          </div>
-        </ng-container>
+                  <div class="pill-row mt-2">
+                    <label class="coverpill" [class.active]="sortBy==='cashless'">
+                      <input type="radio" name="sortBy" value="cashless" [(ngModel)]="sortBy">
+                      <span>Cashless hospitals network</span>
+                    </label>
+                  </div>
+                </ng-container>
 
-        <!-- COVERAGE AMOUNT -->
-        <ng-container *ngSwitchCase="'cover'">
-          <h5 class="panel-title">Coverage Amount</h5>
-          <p class="panel-sub">Pick a sum insured band</p>
+                <!-- COVERAGE AMOUNT -->
+                <ng-container *ngSwitchCase="'cover'">
+                  <h5 class="panel-title">Coverage Amount</h5>
+                  <p class="panel-sub">Pick a sum insured band</p>
 
-          <div class="pill-row">
-            <label class="coverpill" [class.active]="coverageAmount==='Recommended'">
-              <input type="radio" name="coverageAmount" value="Recommended" [(ngModel)]="coverageAmount">
-              <span>Recommended</span>
-            </label>
+                  <div class="pill-row">
+                    <label class="coverpill" [class.active]="coverageAmount==='Recommended'">
+                      <input type="radio" name="coverageAmount" value="Recommended" [(ngModel)]="coverageAmount">
+                      <span>Recommended</span>
+                    </label>
 
-            <label class="coverpill" [class.active]="coverageAmount==='Below 5 Lakh'">
-              <input type="radio" name="coverageAmount" value="Below 5 Lakh" [(ngModel)]="coverageAmount">
-              <span>Below ₹5 Lakh</span>
-            </label>
+                    <label class="coverpill" [class.active]="coverageAmount==='Below 5 Lakh'">
+                      <input type="radio" name="coverageAmount" value="Below 5 Lakh" [(ngModel)]="coverageAmount">
+                      <span>Below ₹5 Lakh</span>
+                    </label>
 
-            <label class="coverpill" [class.active]="coverageAmount==='5-9 Lakh'">
-              <input type="radio" name="coverageAmount" value="5-9 Lakh" [(ngModel)]="coverageAmount">
-              <span>₹5 – 9 Lakh</span>
-            </label>
+                    <label class="coverpill" [class.active]="coverageAmount==='5-9 Lakh'">
+                      <input type="radio" name="coverageAmount" value="5-9 Lakh" [(ngModel)]="coverageAmount">
+                      <span>₹5 – 9 Lakh</span>
+                    </label>
 
-            <label class="coverpill" [class.active]="coverageAmount==='25-99 Lakh'">
-              <input type="radio" name="coverageAmount" value="25-99 Lakh" [(ngModel)]="coverageAmount">
-              <span>₹25 – 99 Lakh</span>
-            </label>
+                    <label class="coverpill" [class.active]="coverageAmount==='25-99 Lakh'">
+                      <input type="radio" name="coverageAmount" value="25-99 Lakh" [(ngModel)]="coverageAmount">
+                      <span>₹25 – 99 Lakh</span>
+                    </label>
 
-            <label class="coverpill" [class.active]="coverageAmount==='1-1.99 Cr'">
-              <input type="radio" name="coverageAmount" value="1-1.99 Cr" [(ngModel)]="coverageAmount">
-              <span>₹1 Cr – ₹1.99 Cr</span>
-            </label>
+                    <label class="coverpill" [class.active]="coverageAmount==='1-1.99 Cr'">
+                      <input type="radio" name="coverageAmount" value="1-1.99 Cr" [(ngModel)]="coverageAmount">
+                      <span>₹1 Cr – ₹1.99 Cr</span>
+                    </label>
 
-            <label class="coverpill" [class.active]="coverageAmount==='2-6 Cr'">
-              <input type="radio" name="coverageAmount" value="2-6 Cr" [(ngModel)]="coverageAmount">
-              <span>₹2 Cr – ₹6 Cr</span>
-            </label>
-          </div>
-        </ng-container>
+                    <label class="coverpill" [class.active]="coverageAmount==='2-6 Cr'">
+                      <input type="radio" name="coverageAmount" value="2-6 Cr" [(ngModel)]="coverageAmount">
+                      <span>₹2 Cr – ₹6 Cr</span>
+                    </label>
+                  </div>
+                </ng-container>
 
-        <!-- ROOM -->
+        <!-- Other filter sections -->
         <ng-container *ngSwitchCase="'room'">
           <h5 class="panel-title">Room Rent Type</h5>
           <p class="panel-sub">Choose your preferred room type</p>
@@ -477,7 +454,6 @@
             </label>
           </div>
         </ng-container>
-
       </section>
     </div>
 
@@ -486,6 +462,5 @@
       <button class="link-btn" (click)="clearFilters()">Clear filters</button>
       <button class="primary-btn" (click)="applyFilters()">Show Plans</button>
     </div>
-
   </div>
 </div>
