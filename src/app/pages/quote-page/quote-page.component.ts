@@ -104,7 +104,7 @@ ngOnInit(): void {
       zone: "1"
     };
 
-    // localStorage.setItem('healthFormData', JSON.stringify(raw));
+    localStorage.setItem('healthFormData', JSON.stringify(raw));
     const savedData = localStorage.getItem('healthFormData');
 
     if (savedData) {
